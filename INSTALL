@@ -1,0 +1,14 @@
+  How To Build and Install quokka
+  ===============================
+
+  This package does not provide an automated way to build or install the program
+  because quokka runs on top of node.js that is a javascript interpreter (if you
+  want to know more about node.js, visit http://nodejs.org). The simplest way to
+  use quokka is just to run it using node.js as follows:
+
+    $ node quokka.js <files-to-rename>
+
+  where the `$' indicates a user prompt.
+
+  In a Unix-like environment, it would be more convenient to put a shell script
+  that runs quokka into a directory like /usr/bin or /usr/local/bin.
