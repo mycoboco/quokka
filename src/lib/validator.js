@@ -15,7 +15,8 @@ module.exports = function (kind) {
         checkset = {
         'unix-like': {
             invalid:   [ path.sep, '\0' ],
-            reserved:  [ '.', '..'],
+            reserved:  [ ],
+            special:   [ '.', '..' ],
             length:    255,
             refrained: [ '\\', '?', '%', '*', ':', '|', '"', '<', '>' ]
         },
@@ -25,12 +26,12 @@ module.exports = function (kind) {
                          '\x10', '\x11', '\x12', '\x13', '\x14', '\x15', '\x16', '\x17', '\x18',
                          '\x19', '\x1A', '\x1B', '\x1C', '\x1D', '\x1E', '\x1F', '"', ':', '<',
                          '>', '?', '|' ],
-            reserved:  [ '.', '..', '$AttrDef', '$BadClus', '$Bitmap', '$Boot', '$LogFile', '$MFT',
-                         '$MFTMirr', 'pagefile.sys', '$Secure', '$UpCase', '$Volume', '$Extend',
-                         '$Extend', '$ObjId', '$Quota', '$Reparse', 'AUX', 'CLOCK$', 'COM1', 'COM2',
-                         'COM3', 'COM4', 'COM5', 'COM6', 'COM7', 'COM8', 'COM9', 'CON', 'LPT1',
-                         'LPT2', 'LPT3', 'LPT4', 'LPT5', 'LPT6', 'LPT7', 'LPT8', 'LPT9', 'NUL',
-                         'PRN' ],
+            reserved:  [ '$AttrDef', '$BadClus', '$Bitmap', '$Boot', '$LogFile', '$MFT', '$MFTMirr',
+                         'pagefile.sys', '$Secure', '$UpCase', '$Volume', '$Extend', '$Extend',
+                         '$ObjId', '$Quota', '$Reparse', 'AUX', 'CLOCK$', 'COM1', 'COM2', 'COM3',
+                         'COM4', 'COM5', 'COM6', 'COM7', 'COM8', 'COM9', 'CON', 'LPT1', 'LPT2',
+                         'LPT3', 'LPT4', 'LPT5', 'LPT6', 'LPT7', 'LPT8', 'LPT9', 'NUL', 'PRN' ],
+            special:   [ '.', '..' ],
             length:    255,
             refrained: [ '%', '*' ]
         }
@@ -59,6 +60,19 @@ module.exports = function (kind) {
                     msg:  'invalid character `%v\' encountered in file name',
                     what: sel.invalid[i]
                 };
+        for (var i = 0; i < sel.special.length; i++)
+            if (name === sel.special[i])
+                return {
+                    name: 'invalid',
+                    msg:  '`%v\' cannot be used for file name',
+                    what: set.speicial[i]
+                };
+        if (name.length > sel.length)
+            return {
+                name: 'invalid',
+                msg:  'file name is too long',
+                what: ''
+            };
         for (var i = 0; i < sel.reserved.length; i++)
             if (name.startsWith(sel.reserved[i]))
                 return {
