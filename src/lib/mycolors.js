@@ -82,13 +82,18 @@ var mycolors = module.exports = function (theme) {
     (function () {
         assert(theme);
 
+        String.prototype.__defineGetter__('none', function () {
+            return this;
+        });
+
         theme.foreach(function (i) {
             assert(theme[i].color);
             assert(theme[i].abbr);
             assert(theme[i].abbr !== 's');
             assert(_.isUndefined(abbr[theme[i].abbr]));
 
-            color[i] = theme[i].color;
+            if (theme[i].color !== 'none')    // `none' handled here
+                color[i] = theme[i].color;
             abbr[theme[i].abbr] = i;
         });
 

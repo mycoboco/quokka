@@ -14,8 +14,8 @@ var argv = require('./node_modules/optimist')
                .boolean('n')
                .argv;
 var string = require('./node_modules/string');
-var alphanum = require('./node_modules/alphanum/alphanum.js');
 
+var alphanum = require('./lib/alphanum.js');
 var global = require('./lib/global');
 var mycolors = require('./lib/mycolors');
 var validator = require('./lib/validator')();
@@ -665,6 +665,14 @@ var completer = function (init) {
         reset:     reset,
         completer: completer
     };
+};
+
+
+// adds `none' as color property
+var setNone = function () {
+    String.prototype.__defineGetter__('none', function () {
+        return this;
+    });
 };
 
 
