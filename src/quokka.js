@@ -668,14 +668,6 @@ var completer = function (init) {
 };
 
 
-// adds `none' as color property
-var setNone = function () {
-    String.prototype.__defineGetter__('none', function () {
-        return this;
-    });
-};
-
-
 // quokka starts from here
 (function () {
     var mc;
