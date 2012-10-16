@@ -1,12 +1,12 @@
   quokka: An Interactive File Renamer
   ===================================
 
-  For your convenience, the package for quokka contains all node.js modules
-  that it depends on to run, and their licenses are specified in their
-  installation directories, most of which are the MIT license while alphanum.js
-  is licensed under the LGPL license. (There are small changes to alphanum.js
-  and colors.js, which the accompanying README file elaborates on.)
-  The following license does not apply to those modules.
+  For your convenience, the package for quokka contains non-npm modules it
+  depends on to run, and their licenses are specified in their installation
+  directories. For example, alphanum.js says in its heading comment that it is
+  licensed under the LGPL; there are small changes to alphanum.js, which the
+  accompanying README file elaborates on. The following license does not apply
+  to those modules.
 
 
   Copyright (C) 2012 by Jun Woong.
