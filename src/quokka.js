@@ -14,12 +14,12 @@ var argv = require('./node_modules/optimist')
                .boolean('n')
                .argv;
 var string = require('./node_modules/string');
+var wcwidth = require('./node_modules/wcwidth.js')();
 
 var alphanum = require('./lib/alphanum.js');
 var global = require('./lib/global');
 var mycolors = require('./lib/mycolors');
 var validator = require('./lib/validator')();
-var wcwidth = require('./lib/wcwidth');
 
 var comp;                  // completer
 var out, ok, err, warn;    // for mycolors().{out,ok,err,warn}
