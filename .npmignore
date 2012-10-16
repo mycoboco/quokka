@@ -1,0 +1,5 @@
+.hg
+.hgtags
+.hgignore
+.npmignore
+src/node_modules/
