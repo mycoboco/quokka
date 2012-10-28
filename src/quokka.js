@@ -21,43 +21,10 @@ var global = require('./lib/global');
 var mycolors = require('./lib/mycolors');
 var validator = require('./lib/validator')();
 
-var comp;                  // completer
-var out, ok, err, warn;    // for mycolors().{out,ok,err,warn}
+// rules
+var extension = require('./extension');
 
-
-// parses a quoted string
-// x = 'string to parse'
-var parseQStr = function (x) {
-    var ns = /[\S]+/g,
-        esc = /\\(['|"|\\])/g;
-    var q, s, e;
-
-    assert(_.isString(x));
-
-    x = x.trim();
-
-    if (!x)
-        return [ '', '' ];
-    else if (x.indexOf('\'') >= 0)
-        q = '\'';
-    else if (x.indexOf('"') >= 0)
-        q = '"';
-    if (!q)
-        return [ ns.exec(x)[0], x.substring(ns.lastIndex) ];
-
-    x = x.substring(1);    // skips quote
-    s = 0;
-    do {
-        e = x.indexOf(q, s);
-        if (e < 0) {
-            err('closing %s is missing\n', q);
-            return [ x, '' ];
-        }
-        s = e + 1;
-    } while(x.charAt(e-1) === '\\');
-
-    return [ x.substring(0, e).replace(esc, '$1'), x.substring(e+1) ];
-};
+var parseQStr = global.parseQStr;
 
 
 // fills a path object
@@ -393,115 +360,6 @@ var runCommand = function (cmdset, input) {
 };
 
 
-// rule for extension
-var extension = function () {
-    var cmdset;
-    var option = {
-        limit: -1    // no limit
-    };
-
-    // prints help message
-    var help = function () {
-        //   12345678911234567892123456789312345678941234567895123456789612345678971234567898
-        console.log(
-            'Commands for `extension\' are:\n'.ok +
-            '  change to <NEWEXT>     '.cmd + 'change extensions of files to <NEWEXT>\n' +
-            '                         e.g., `change to "txt"\' changes extensions to `.txt\'\n' +
-            '  limit <N>              '.cmd + 'not considered an extension if longer than <N>\n' +
-            '                         e.g., `limit 3\' stops `.html\' from being recognized\n' +
-            '                               as an extension\n' +
-            '  limit off              '.cmd + '`limit\' will be no longer used\n');
-    };
-
-    // gets command set
-    var commandSet = function () {
-        assert(cmdset);
-        return cmdset;
-    };
-
-    var _rule = function (name) {
-        var e;
-
-        assert(_.isString(name) && name);
-
-        if (_.isUndefined(option.newext))
-            return name;
-
-        e = name.lastIndexOf('.');
-        if (e <= 0 || (option.limit >= 0 && name.length-e-1 > option.limit))
-            e = name.length;
-        name = name.substring(0, e);
-        if (option.newext)
-            name += '.';
-        name += option.newext;
-
-        return name;
-    };
-
-    // applies the rule to file names
-    // src = [ { dir: 'dir name', file: 'file name' }, ... ]
-    var affect = function (src) {
-        assert(_.isArray(src));
-
-        var dst = [];
-
-        for (var i = 0; i < src.length; i++)
-            dst.push({
-                dir:  src[i].dir,
-                file: _rule(src[i].file)
-            });
-
-        return dst;
-    };
-
-    // gets string to describe options
-    var option = function () {
-        var r = '';
-
-        if (option.newext)
-            r += 'change to `' + option.newext.val + '\'';
-        r = ((r)? r+', ': '') + 'limit ' + ((option.limit < 0)? 'off'.val: (option.limit+'').val);
-
-        return r;
-    };
-
-    cmdset = {
-        'change to': function (input) {
-            var r = parseQStr(input);
-            ok('file extensions will change to `%v\'\n', r[0]);
-            option.newext = r[0];
-
-            return r[1];
-        },
-        'limit': function (input) {
-            var r = parseQStr(input);
-            if (r[0] === 'off') {
-                ok('every extension will be affected\n');
-                option.limit = -1
-            } else {
-                option.limit = r[0].toInt();
-                if (!_.isFinite(option.limit) || option.limit < 0) {
-                    err('invalid limit value\n');
-                    option.limit = -1;
-                } else
-                    ok('extensions with more than %v chars will not be affected\n', option.limit+'');
-            }
-
-            return r[1];
-        }
-    };
-
-    comp.add(_.keys(cmdset).alphanumSort());
-
-    return {
-        help:       help,
-        commandSet: commandSet,
-        affect:     affect,
-        option:     option
-    };
-};
-
-
 // terminates program
 var exit = function () {
     string.restorePrototype();
@@ -543,7 +401,7 @@ var nameList = function (list) {
         if (file === '.' || file === '..')
             continue;
         if (!fs.existsSync(dir + path.sep + file)) {
-            err('file `%f\' does not exist', dir+path.sep+file);
+            ERR('file `%f\' does not exist', dir+path.sep+file);
             continue;
         }
         if (dup[dir + path.sep + file])
@@ -567,7 +425,7 @@ var handleArgv = function () {
 
     var _usage = function () {
         //   12345678911234567892123456789312345678941234567895123456789612345678971234567898
-        out(
+        OUT(
             '\n' +
             'Usage: ' + 'quokka'.prog + ' [OPTION...] [FILE]...\n' +
             'Rename FILEs in an interactive manner.\n\n' +
@@ -578,25 +436,25 @@ var handleArgv = function () {
             '-f', '--file',
             '-v',
             '-n');
-        out('For bug reporting instructions, please see:\n'.etc +
+        OUT('For bug reporting instructions, please see:\n'.etc +
             '<http://code.woong.org/quokka>.\n'.etc);
         exit();
     };
 
     if (argv.f || argv.file) {
         if (argv.f && argv.file) {
-            err('only one of `%c\' or `%c\' must be given', '-f', '--file');
+            ERR('only one of `%c\' or `%c\' must be given', '-f', '--file');
             _usage();
         } else {
             argv.f = argv.f || argv.file;
             if (!_.isString(argv.f) || !argv.f) {
-                err('file name must be given to `%c\' or `%c\'', '-f', '--file');
+                ERR('file name must be given to `%c\' or `%c\'', '-f', '--file');
                 _usage();
             }
             try {
                 buf = fs.readFileSync(argv.f);
             } catch(e) {
-                err('%s', e.message);
+                ERR('%s', e.message);
                 _usage();
             };
             argv._ = split(buf.toString());
@@ -668,6 +526,17 @@ var completer = function (init) {
 };
 
 
+// exposes variables as global to share with rules
+// those variables will be written in UPPERCASE
+var setGlobal = function (vars) {
+    assert(_.isObject(vars));
+
+    vars.foreach(function (v) {
+        GLOBAL[v] = this[v];
+    });
+};
+
+
 // quokka starts from here
 (function () {
     var mc;
@@ -693,10 +562,12 @@ var completer = function (init) {
         'etc':  { abbr: 'x', color: 'grey' }
     });
 
-    out = mc.out;
-    ok = mc.ok;
-    err = mc.err;
-    warn = mc.warn;
+    setGlobal({
+        OUT:  mc.out,
+        OK:   mc.ok,
+        ERR:  mc.err,
+        WARN: mc.warn
+    });
 
     files = handleArgv();
     assert(_.isArray(files));
@@ -712,7 +583,7 @@ var completer = function (init) {
 
     var help = function () {
         //   12345678911234567892123456789312345678941234567895123456789612345678971234567898
-        out('Global commands are:\n'.ok +
+        OUT('Global commands are:\n'.ok +
             '  cancel       '.cmd + 'discard the rule in editing\n' +
             '  remove <N>   '.cmd + 'remove rule #<N> from rule chain\n' +
             '  done         '.cmd + 'apend the rule in editing to rule chain\n' +
@@ -728,7 +599,7 @@ var completer = function (init) {
 
     var version = function () {
         //   12345678911234567892123456789312345678941234567895123456789612345678971234567898
-        out('quokka'.prog + ': an interactive file renamer 0.0.1\n%x',
+        OUT('quokka'.prog + ': an interactive file renamer 0.0.1\n%x',
             'This is free software; see the LICENSE file for more information. There is NO\n' +
             'warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n' +
             'Written by Jun Woong\n');
@@ -804,15 +675,15 @@ var completer = function (init) {
         if (!cb)
             cb = function (p, pmax, n, nmax, invalid, conflict) {
                 var level = (invalid && invalid.name === 'refrained')?
-                            { out: warn, color: 'warn' }:
-                            { out: err,  color: 'err'  };
-                out('%s | %s%s%s', pad(p.print, pmax), pad(n.print, nmax),
+                            { out: WARN, color: 'warn' }:
+                            { out: ERR,  color: 'err'  };
+                OUT('%s | %s%s%s', pad(p.print, pmax), pad(n.print, nmax),
                     (invalid)? ' [' + '!!!'[level.color] + ']': '',
                     (conflict)? ' [' + '!!!'.err + ']': '');
                 if (invalid)
-                    level.out(invalid.msg, invalid.what);
+                    level.OUT(invalid.msg, invalid.what);
                 if (conflict)
-                    err(conflict.msg, conflict.what);
+                    ERR(conflict.msg, conflict.what);
             };
         assert(_.isFunction(cb));
 
@@ -823,7 +694,7 @@ var completer = function (init) {
             var conflict = validator.conflict(compose(i), next[i].full);
             cb(prev[i], plenmax, next[i], nlenmax, invalid, conflict);
         }
-        out('');
+        OUT('');
     };
 
     var ruleList = function (list) {
@@ -847,9 +718,9 @@ var completer = function (init) {
 
         namemax = max(strArray(list, function (entry) { return entry.name; }));
         for (i = 0; i < list.length; i++)
-            out('%n: %r ( %s )', pad(_digitpad(list.length), i+1+''), pad(list[i].name, namemax),
+            OUT('%n: %r ( %s )', pad(_digitpad(list.length), i+1+''), pad(list[i].name, namemax),
                                 list[i].option);
-        out('');
+        OUT('');
     };
 
     var cmdset = {
@@ -873,27 +744,27 @@ var completer = function (init) {
         'cancel': function (input) {
             var name = ctx.name();
             if (!ctx.set() && !_.isUndefined(input))
-                warn('no rule in editing\n');
+                WARN('no rule in editing\n');
             else if (!_.isUndefined(input))
-                ok('exiting from `%r\'\n', name);
+                OK('exiting from `%r\'\n', name);
             prompt = defPrompt;
-            comp.reset();
+            COMPLETER.reset();
             return input;
         },
         'done': function (input) {
             if (!_.isUndefined(input) && ctx.isSet())
                 ch.append(ctx.current());
-            ok('files will be renamed as follows when you type `%c\'', 'rename');
-            out('-------------------------------------------------------');
+            OK('files will be renamed as follows when you type `%c\'', 'rename');
+            OUT('-------------------------------------------------------');
             fromTo(ch.initial(), ch.final());
             cmdset['cancel']();
             return input;
         },
         'preview': function (input) {
             if (ctx.isSet()) {
-                ok('files will be renamed as follows when you type `%c\' and `%c\'',
+                OK('files will be renamed as follows when you type `%c\' and `%c\'',
                    'done', 'rename');
-                out('------------------------------------------------------------------');
+                OUT('------------------------------------------------------------------');
                 fromTo(ch.initial(), ch.peek(ctx.current()));
             } else
                 cmdset['done']();
@@ -901,10 +772,10 @@ var completer = function (init) {
         },
         'rules': function (input) {
             rules = ch.ruleList();
-            out('rules are applied as follows\n'.ok +
+            OUT('rules are applied as follows\n'.ok +
                 '----------------------------');
             if (rules.length === 0)
-                warn('no rule in rule chain\n');
+                WARN('no rule in rule chain\n');
             else
                 ruleList(rules);
             return input;
@@ -915,7 +786,7 @@ var completer = function (init) {
             tidx = t[0].toInt();
             if (!_.isFinite(fidx) || !_.isFinite(tidx) || fidx < 1 || fidx >= ch.ruleLength() ||
                 tidx < 1 || tidx >= ch.ruleLength()) {
-                err('invalid rule index\n');
+                ERR('invalid rule index\n');
             } else {
                 ch.move(fidx, tidx);
                 cmdset['rules']();
@@ -926,7 +797,7 @@ var completer = function (init) {
             var r = parseQStr(input), idx;
             idx = r[0].toInt();
             if (!_.isFinite(idx) || idx < 1 || idx >= ch.ruleLength()) {
-                err('invalid rule index\n');
+                ERR('invalid rule index\n');
             } else {
                 ch.remove(idx);
                 cmdset['rules']();
@@ -939,10 +810,10 @@ var completer = function (init) {
             if (newset.length > 0)
                 return input;
             if (ctx.isSet())
-                warn('you need to `%c\' or `%c\' the rule in editing\n', 'done', 'cancel');
+                WARN('you need to `%c\' or `%c\' the rule in editing\n', 'done', 'cancel');
             else {
-                ok('files are being renamed');
-                out('----------------------');
+                OK('files are being renamed');
+                OUT('----------------------');
                 fromTo(ch.initial(), ch.final(),
                     function (p, pmax, n, nmax, inv, cflt) {
                         var fail;
@@ -958,19 +829,19 @@ var completer = function (init) {
                             }
                         } else
                             newset.push(p.full);
-                        out('%s | %s%s', pad(p.print, pmax), pad(n.print, nmax),
+                        OUT('%s | %s%s', pad(p.print, pmax), pad(n.print, nmax),
                             (inv || cflt)? ' [' + 'skipped'.warn + ']':
                             (!fail)? ' [' + 'ok'.ok + ']': '');
 
                         if (fail)
-                            err('%s', fail);
+                            ERR('%s', fail);
                         else if (!inv && !cflt) {
                             num++;
                             newset.push(n.full);
                         }
                     });
                 if (num > 0)
-                    ok('%s files successfully renamed', num+'');
+                    OK('%s files successfully renamed', num+'');
                 newset = nameList(newset);
             }
             return input;
@@ -978,17 +849,19 @@ var completer = function (init) {
         'reset': function (input) {
             if (newset.length > 0) {
                 ch.initial(newset);
-                ok('file list and rules have been reset\n');
+                OK('file list and rules have been reset\n');
                 newset = [];
             } else
-                err('nothing to reset; `rename\' first\n');
+                ERR('nothing to reset; `rename\' first\n');
             return input;
         }
     };
 
-    comp = completer(_.keys(cmdset).concat(names).alphanumSort());
+    setGlobal({
+        COMPLETER: completer(_.keys(cmdset).concat(names).alphanumSort())
+    });
 
-    rl = readline.createInterface(process.stdin, process.stdout, comp.completer);
+    rl = readline.createInterface(process.stdin, process.stdout, COMPLETER.completer);
     rl.setPrompt(prompt);
     rl.prompt();
 
@@ -1012,11 +885,11 @@ var completer = function (init) {
                 regex = new RegExp('^' + names[i] + '\\b');
                 if (regex.test(input)) {
                     if (names[i] === ctx.name())
-                        err('you are already in `%r\'\n', names[i].rule);
+                        ERR('you are already in `%r\'\n', names[i].rule);
                     else if (ctx.isSet())
-                        err('you need to cancel the rule in editing first\n');
+                        ERR('you need to cancel the rule in editing first\n');
                     else {
-                        ok('entering `%r\'\n', names[i]);
+                        OK('entering `%r\'\n', names[i]);
                         prompt = names[i] + '> ';
                         ctx.set(ch, names[i]);
                     }
@@ -1026,16 +899,16 @@ var completer = function (init) {
             }
 
             if (ret === null && i === names.length) {
-                err('invalid command `%c\'\n', input);
+                ERR('invalid command `%c\'\n', input);
                 break;
             }
             if (newset.length > 0)
-                warn('you need to `reset\' file list and rules after `rename\'\n');
+                WARN('you need to `reset\' file list and rules after `rename\'\n');
         }
         rl.setPrompt(prompt);
         rl.prompt();
     }).on('close', function () {
-        out('');
+        OUT('');
         exit();
     });
 })();
