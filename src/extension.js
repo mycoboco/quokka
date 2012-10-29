@@ -22,7 +22,7 @@ module.exports = function () {
     var help = function () {
         //   12345678911234567892123456789312345678941234567895123456789612345678971234567898
         console.log(
-            'Commands for `extension\' are:\n'.ok +
+            'Commands for `#extension\' are:\n'.ok +
             '  change to <NEWEXT>     '.cmd + 'change extensions of files to <NEWEXT>\n' +
             '                         e.g., `change to "txt"\' changes extensions to `.txt\'\n' +
             '  limit <N>              '.cmd + 'not considered an extension if longer than <N>\n' +

@@ -575,7 +575,7 @@ var setGlobal = function (vars) {
     ch = chain(files);
     ch.rule([
         {
-            name:        'extension',
+            name:        '#extension',
             constructor: extension
         }
     ]);
