@@ -23,6 +23,7 @@ var validator = require('./lib/validator')();
 
 // rules
 var extension = require('./extension');
+var insert = require('./insert');
 
 var parseQStr = global.parseQStr;
 
@@ -577,6 +578,10 @@ var setGlobal = function (vars) {
         {
             name:        '#extension',
             constructor: extension
+        },
+        {
+            name:        '#insert',
+            constructor: insert
         }
     ]);
     names = ch.ruleNames();
@@ -584,17 +589,17 @@ var setGlobal = function (vars) {
     var help = function () {
         //   12345678911234567892123456789312345678941234567895123456789612345678971234567898
         OUT('Global commands are:\n'.ok +
-            '  cancel       '.cmd + 'discard the rule in editing\n' +
-            '  remove <N>   '.cmd + 'remove rule #<N> from rule chain\n' +
-            '  done         '.cmd + 'apend the rule in editing to rule chain\n' +
-            '  exit         '.cmd + 'terminates quokka\n' +
-            '  help         '.cmd + 'show this message\n' +
-            '  move <N> <M> '.cmd + 'move rule #<N> to #<M>\n' +
-            '  preview      '.cmd + 'dry-run renaming files\n' +
-            '  quit         '.cmd + 'terminates quokka\n' +
-            '  rename       '.cmd + 'rename files\n' +
-            '  rules        '.cmd + 'show rule chain\n' +
-            '  version      '.cmd + 'show version information\n');
+            '  cancel            '.cmd + 'discard the rule in editing\n' +
+            '  done              '.cmd + 'apend the rule in editing to rule chain\n' +
+            '  exit              '.cmd + 'terminates quokka\n' +
+            '  help              '.cmd + 'show this message\n' +
+            '  move <N> <M>      '.cmd + 'move rule #<N> to #<M>\n' +
+            '  preview           '.cmd + 'dry-run renaming files\n' +
+            '  quit              '.cmd + 'terminates quokka\n' +
+            '  remove <N>        '.cmd + 'remove rule #<N> from rule chain\n' +
+            '  rename            '.cmd + 'rename files\n' +
+            '  rules             '.cmd + 'show rule chain\n' +
+            '  version           '.cmd + 'show version information\n');
     };
 
     var version = function () {
@@ -681,7 +686,7 @@ var setGlobal = function (vars) {
                     (invalid)? ' [' + '!!!'[level.color] + ']': '',
                     (conflict)? ' [' + '!!!'.err + ']': '');
                 if (invalid)
-                    level.OUT(invalid.msg, invalid.what);
+                    OUT(invalid.msg, invalid.what);
                 if (conflict)
                     ERR(conflict.msg, conflict.what);
             };

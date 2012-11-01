@@ -54,6 +54,15 @@ Number.method('integer', function () {
 });
 
 
+// replaceAll from string.js does not work for regex-like strings
+String.method('replaceAllNew', function(str1, str2, ignore)
+{
+    return this.replace(new RegExp(str1.replace(/([\/\,\!\\\^\$\{\}\[\]\(\)\.\*\+\?\|\<\>\-\&])/g,"\\$&"),
+                                                (ignore?"gi":"g")),
+                        (typeof(str2)=="string")?str2.replace(/\$/g,"$$$$"):str2);
+});
+
+
 // parses a quoted string
 // x = 'string to parse'
 exports.parseQStr = function (x) {
@@ -86,6 +95,23 @@ exports.parseQStr = function (x) {
     } while(x.charAt(e-1) === '\\');
 
     return [ x.substring(0, e).replace(esc, '$1'), x.substring(e+1) ];
+};
+
+
+// gets extension of file name
+// name = 'base name'
+// n = max length of extension
+exports.extension = function (name, n) {
+    var i;
+
+    assert(_.isString(name));
+    assert(_.isUndefined(n) || _.isFinite(n));
+
+    i = name.lastIndexOf('.');
+    if (i < 0 || i === 0 || (n > -1 && name.length-i-1 > n))
+        i = name.length;
+
+    return [ name.substring(0, i), name.substring(i) ];
 };
 
 // end of global.js

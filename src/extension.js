@@ -14,7 +14,7 @@ var parseQStr = global.parseQStr;
 // rule for extension
 module.exports = function () {
     var cmdset;
-    var option = {
+    var opt = {
         limit: -1    // no limit
     };
 
@@ -23,12 +23,12 @@ module.exports = function () {
         //   12345678911234567892123456789312345678941234567895123456789612345678971234567898
         console.log(
             'Commands for `#extension\' are:\n'.ok +
-            '  change to <NEWEXT>     '.cmd + 'change extensions of files to <NEWEXT>\n' +
-            '                         e.g., `change to "txt"\' changes extensions to `.txt\'\n' +
-            '  limit <N>              '.cmd + 'not considered an extension if longer than <N>\n' +
-            '                         e.g., `limit 3\' stops `.html\' from being recognized\n' +
-            '                               as an extension\n' +
-            '  limit off              '.cmd + '`limit\' will be no longer used\n');
+            '  change to <NEWEXT>      '.cmd + 'change extensions of files to <NEWEXT>\n' +
+            '                            e.g., `change to "txt"\' changes extensions to `.txt\'\n' +
+            '  limit <N>               '.cmd + 'not considered an extension if longer than <N>\n' +
+            '                            e.g., `limit 3\' stops `.html\' from being recognized\n' +
+            '                                  as an extension\n' +
+            '  limit off               '.cmd + '`limit\' will be no longer used\n');
     };
 
     // gets command set
@@ -38,22 +38,13 @@ module.exports = function () {
     };
 
     var _rule = function (name) {
-        var e;
+        var r;
 
-        assert(_.isString(name) && name);
-
-        if (_.isUndefined(option.newext))
+        if (_.isUndefined(opt.newext))
             return name;
 
-        e = name.lastIndexOf('.');
-        if (e <= 0 || (option.limit >= 0 && name.length-e-1 > option.limit))
-            e = name.length;
-        name = name.substring(0, e);
-        if (option.newext)
-            name += '.';
-        name += option.newext;
-
-        return name;
+        r = global.extension(name, opt.limit);
+        return r[0] + ((opt.newext)? '.': '') + opt.newext;
     };
 
     // applies the rule to file names
@@ -76,9 +67,9 @@ module.exports = function () {
     var option = function () {
         var r = '';
 
-        if (option.newext)
-            r += 'change to `' + option.newext.val + '\'';
-        r = ((r)? r+', ': '') + 'limit ' + ((option.limit < 0)? 'off'.val: (option.limit+'').val);
+        if (opt.newext)
+            r += 'change to `' + opt.newext.val + '\'';
+        r = ((r)? r+', ': '') + 'limit ' + ((opt.limit < 0)? 'off'.val: (opt.limit+'').val);
 
         return r;
     };
@@ -87,7 +78,7 @@ module.exports = function () {
         'change to': function (input) {
             var r = parseQStr(input);
             OK('file extensions will change to `%v\'\n', r[0]);
-            option.newext = r[0];
+            opt.newext = r[0];
 
             return r[1];
         },
@@ -95,14 +86,14 @@ module.exports = function () {
             var r = parseQStr(input);
             if (r[0] === 'off') {
                 OK('every extension will be affected\n');
-                option.limit = -1
+                opt.limit = -1
             } else {
-                option.limit = r[0].toInt();
-                if (!_.isFinite(option.limit) || option.limit < 0) {
+                opt.limit = r[0].toInt();
+                if (!_.isFinite(opt.limit) || opt.limit < 0) {
                     ERR('invalid limit value\n');
-                    option.limit = -1;
+                    opt.limit = -1;
                 } else
-                    OK('extensions with more than %v chars will not be affected\n', option.limit+'');
+                    OK('extensions with more than %v chars will not be affected\n', opt.limit+'');
             }
 
             return r[1];

@@ -65,7 +65,7 @@ module.exports = function (kind) {
                 return {
                     name: 'invalid',
                     msg:  '`%v\' cannot be used for file name',
-                    what: set.speicial[i]
+                    what: sel.special[i]
                 };
         if (name.length > sel.length)
             return {
