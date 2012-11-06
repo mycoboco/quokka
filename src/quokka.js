@@ -757,6 +757,8 @@ var setGlobal = function (vars) {
             return input;
         },
         'done': function (input) {
+            if (!ctx.set() && !_.isUndefined(input))
+                WARN('no rule in editing\n');
             if (!_.isUndefined(input) && ctx.isSet())
                 ch.append(ctx.current());
             OK('files will be renamed as follows when you type `%c\'', 'rename');
