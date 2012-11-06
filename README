@@ -7,15 +7,15 @@
   with a new one and so on. You can combine these rules as you want by adding
   them into the rule chain. Editing each rule and the rule chain is performed
   interactively as you do in a shell prompt. The following, for example, shows
-  how to rename files' extensions to `.node' using quokka:
+  how to rename files' extensions to '.node' using quokka:
 
-    > extension
+    > #extension
     entering `extension'
 
-    extension> change to node
+    #extension> change to node
     file extensions will change to `node'
 
-    extension> preview
+    #extension> preview
     files will be renamed as follows when you type `done' and `rename'
     ------------------------------------------------------------------
     ./global.js    | ./global.node
@@ -23,7 +23,7 @@
     ./validator.js | ./validator.node
     ./wcwidth.js   | ./wcwidth.node
 
-    extension> done
+    #extension> done
     files will be renamed as follows when you type `rename'
     -------------------------------------------------------
     ./global.js    | ./global.node
@@ -44,8 +44,8 @@
 
     > exit
 
-  where the `>' indicates a quokka's prompt and `extension' before it does the
-  user is editing the `extension' rule. Typing `help' shows what commands
+  where the '>' indicates a quokka's prompt and '#extension' before it does the
+  user is editing the '#extension' rule. Typing 'help' shows what commands
   quokka accepts in general and in a specific rule mode.
 
   Even if its source code contains some stuff realted to MS Windows, it
@@ -57,7 +57,7 @@
   accompanying LICENSE file.
 
   Among libraries used, alphanum.js has been modified to meet quokka's needs;
-  it has been modified to behave in a more similar way to `ls -v' and to return
+  it has been modified to behave in a more similar way to 'ls -v' and to return
   the sorted array instead of nothing. If you need to replace that module with,
   say, a updated one, it is necessary to apply these changes properly.
 
