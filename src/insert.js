@@ -16,7 +16,7 @@ var parseQStr = global.parseQStr;
 module.exports = function () {
     var cmdset;
     var opt = {    // default: insert nothing as prefix
-        text: '',
+        text:    '',
         skipext: true
     };
 

@@ -24,6 +24,7 @@ var validator = require('./lib/validator')();
 // rules
 var extension = require('./extension');
 var insert = require('./insert');
+var del = require('./delete');
 
 var parseQStr = global.parseQStr;
 
@@ -242,7 +243,7 @@ var chain = function (init) {
         final:      final,
         append:     append,
         remove:     remove,
-        nove:       move,
+        move:       move,
         peek:       peek,
         ruleList:   ruleList,
         ruleLength: ruleLength,
@@ -582,6 +583,10 @@ var setGlobal = function (vars) {
         {
             name:        '#insert',
             constructor: insert
+        },
+        {
+            name:        '#delete',
+            constructor: del
         }
     ]);
     names = ch.ruleNames();
@@ -747,20 +752,29 @@ var setGlobal = function (vars) {
             return input;
         },
         'cancel': function (input) {
-            var name = ctx.name();
-            if (!ctx.set() && !_.isUndefined(input))
-                WARN('no rule in editing\n');
-            else if (!_.isUndefined(input))
-                OK('exiting from `%r\'\n', name);
+            var name;
+            if (!_.isUndefined(input)) {
+                if (!ctx.isSet())
+                    WARN('no rule in editing\n');
+                else {
+                    name = ctx.name();
+                    ctx.set();
+                    OK('exiting from `%r\'\n', name);
+                }
+            }
             prompt = defPrompt;
             COMPLETER.reset();
             return input;
         },
         'done': function (input) {
-            if (!ctx.set() && !_.isUndefined(input))
-                WARN('no rule in editing\n');
-            if (!_.isUndefined(input) && ctx.isSet())
-                ch.append(ctx.current());
+            if (!_.isUndefined(input)) {
+                if (!ctx.isSet())
+                    WARN('no rule in editing\n');
+                else {
+                    ch.append(ctx.current());
+                    ctx.set();
+                }
+            }
             OK('files will be renamed as follows when you type `%c\'', 'rename');
             OUT('-------------------------------------------------------');
             fromTo(ch.initial(), ch.final());

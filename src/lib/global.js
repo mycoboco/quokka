@@ -114,4 +114,17 @@ exports.extension = function (name, n) {
     return [ name.substring(0, i), name.substring(i) ];
 };
 
+
+// returns string for ordinal number
+exports.ordinal = function (n) {
+    var m;
+
+    assert(_.isFinite(n) && n > 0);
+    m = (n > 20)? n % 10: n;
+
+    return (m == 1)? n + 'st':
+           (m == 2)? n + 'nd':
+           (m == 3)? n + 'rd': n + 'th';
+}
+
 // end of global.js

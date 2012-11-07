@@ -43,7 +43,7 @@ module.exports = function (kind) {
     // checks if base name is valid
     // name = 'base name'
     var isInvalid = function (name) {
-        assert(_.isString(name) && name);
+        assert(_.isString(name));
 
         name = name.trim();
 
