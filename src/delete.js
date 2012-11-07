@@ -49,7 +49,7 @@ module.exports = function () {
     };
 
     var _rule = function (name) {
-        var r;
+        var r = '';
         var s, sn = 0, e, en, t;
 
         if (opt.skipext) {
