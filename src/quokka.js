@@ -594,8 +594,8 @@ var setGlobal = function (vars) {
     var help = function () {
         //   12345678911234567892123456789312345678941234567895123456789612345678971234567898
         OUT('Global commands are:\n'.ok +
-            '  cancel            '.cmd + 'discard the rule in editing\n' +
-            '  done              '.cmd + 'apend the rule in editing to rule chain\n' +
+            '  cancel            '.cmd + 'discard the rule being edited\n' +
+            '  done              '.cmd + 'append the rule being edited to rule chain\n' +
             '  exit              '.cmd + 'terminates quokka\n' +
             '  help              '.cmd + 'show this message\n' +
             '  move <N> <M>      '.cmd + 'move rule #<N> to #<M>\n' +
@@ -755,7 +755,7 @@ var setGlobal = function (vars) {
             var name;
             if (!_.isUndefined(input)) {
                 if (!ctx.isSet())
-                    WARN('no rule in editing\n');
+                    WARN('no rule being edited\n');
                 else {
                     name = ctx.name();
                     ctx.set();
@@ -769,7 +769,7 @@ var setGlobal = function (vars) {
         'done': function (input) {
             if (!_.isUndefined(input)) {
                 if (!ctx.isSet())
-                    WARN('no rule in editing\n');
+                    WARN('no rule being edited\n');
                 else {
                     ch.append(ctx.current());
                     ctx.set();
@@ -781,8 +781,19 @@ var setGlobal = function (vars) {
             cmdset['cancel']();
             return input;
         },
+        'describe': function (input) {
+            if (!ctx.isSet())
+                WARN('no rule being edited; use `%c\' to see the rule chain\n', 'rules');
+            else {
+                OK('current rule being edited');
+                OUT('-------------------------');
+                OUT(ctx.current().instance.option() + '\n');
+            }
+            return input;
+        },
         'preview': function (input) {
             if (ctx.isSet()) {
+                cmdset['describe']();
                 OK('files will be renamed as follows when you type `%c\' and `%c\'',
                    'done', 'rename');
                 OUT('------------------------------------------------------------------');
@@ -831,7 +842,7 @@ var setGlobal = function (vars) {
             if (newset.length > 0)
                 return input;
             if (ctx.isSet())
-                WARN('you need to `%c\' or `%c\' the rule in editing\n', 'done', 'cancel');
+                WARN('you need to `%c\' or `%c\' the rule being edited\n', 'done', 'cancel');
             else {
                 OK('files are being renamed');
                 OUT('----------------------');
@@ -908,7 +919,7 @@ var setGlobal = function (vars) {
                     if (names[i] === ctx.name())
                         ERR('you are already in `%r\'\n', names[i].rule);
                     else if (ctx.isSet())
-                        ERR('you need to cancel the rule in editing first\n');
+                        ERR('you need to cancel the rule being edited first\n');
                     else {
                         OK('entering `%r\'\n', names[i]);
                         prompt = names[i] + '> ';
