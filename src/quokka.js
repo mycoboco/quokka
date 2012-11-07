@@ -595,6 +595,7 @@ var setGlobal = function (vars) {
         //   12345678911234567892123456789312345678941234567895123456789612345678971234567898
         OUT('Global commands are:\n'.ok +
             '  cancel            '.cmd + 'discard the rule being edited\n' +
+            '  describe          '.cmd + 'describe the rule being edited\n' +
             '  done              '.cmd + 'append the rule being edited to rule chain\n' +
             '  exit              '.cmd + 'terminates quokka\n' +
             '  help              '.cmd + 'show this message\n' +
