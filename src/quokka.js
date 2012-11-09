@@ -25,6 +25,7 @@ var validator = require('./lib/validator')();
 var extension = require('./extension');
 var insert = require('./insert');
 var del = require('./delete');
+var remove = require('./remove');
 
 var parseQStr = global.parseQStr;
 
@@ -587,6 +588,10 @@ var setGlobal = function (vars) {
         {
             name:        '#delete',
             constructor: del
+        },
+        {
+            name:        '#remove',
+            constructor: remove
         }
     ]);
     names = ch.ruleNames();
