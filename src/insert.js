@@ -118,14 +118,14 @@ module.exports = function () {
         var where = function () {
             switch(opt.func) {
                 case _prefix:
-                    return 'as prefix' +
-                           ((opt.keephid)? ' keeping hidden files': '');
+                    return 'as ' + 'prefix'.val +
+                           ((opt.keephid)? ' keeping'.val + ' hidden files'.val: '');
                 case _suffix:
-                    return 'as suffix' +
-                           ((opt.skipext)? ' skipping extensions': ' including extensions');
+                    return 'as ' + 'suffix'.val +
+                           ((opt.skipext)? ' skipping'.val: ' including'.val) + ' extensions';
                 case _at:
                     return 'at ' + (''+opt.at).val +
-                           ((opt.reverse)? ' counting from right to left': '');
+                           ((opt.reverse)? ' counting ' + 'from right to left'.val: '');
                 case _after:
                     return 'after `' + opt.after.val + '\'';
                 case _before:

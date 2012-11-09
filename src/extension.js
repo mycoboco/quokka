@@ -65,11 +65,13 @@ module.exports = function () {
 
     // gets string to describe options
     var option = function () {
-        var r = '';
+        var r;
 
-        if (opt.newext)
-            r += 'change to `' + opt.newext.val + '\'';
-        r = ((r)? r+', ': '') + 'limit ' + ((opt.limit < 0)? 'off'.val: (opt.limit+'').val);
+        r = (opt.newext)? 'change to `' + opt.newext.val + '\' ':
+                          'keep'.val + ' the original ';
+        r += (opt.limit < 0)? 'not using'.val + ' limit':
+                              'limiting to ' + (opt.limit+'').val + ' character' +
+                                  ((opt.limit > 1)? 's': '');
 
         return r;
     };
@@ -93,7 +95,8 @@ module.exports = function () {
                     ERR('invalid limit value\n');
                     opt.limit = -1;
                 } else
-                    OK('extensions with more than %v chars will not be affected\n', opt.limit+'');
+                    OK('extensions with more than %v character%s will not be affected\n',
+                       opt.limit+'', (opt.limit > 1)? 's': '');
             }
 
             return r[1];

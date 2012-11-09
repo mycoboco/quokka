@@ -138,6 +138,7 @@ module.exports = function () {
             until = ' until `' + opt.until + '\' encountered';
         if (opt.reverse)
             until += ' counting ' + 'from right to left'.val;
+        until += ((opt.skipext)? ' skipping'.val: ' including'.val) + ' extensions';
 
         return del + from + until;
     };
