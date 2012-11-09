@@ -31,7 +31,7 @@ module.exports = function () {
             '  all                    '.cmd + 'apply to all occurrences\n' +
             '  first                  '.cmd + 'apply only to the first occurrence\n' +
             '  last                   '.cmd + 'apply only to the last occurrence\n' +
-            '  skip extension         '.cmd + 'ignore extensions while deleting (default)\n' +
+            '  skip extension         '.cmd + 'ignore extensions while removing (default)\n' +
             '  include extension      '.cmd + 'remove extensions if should\n' +
             '  case sensitive         '.cmd + 'case matters when finding <TEXT> (default)\n' +
             '  case insensitive       '.cmd + 'case does not matter when finding <TEXT>\n');
@@ -151,13 +151,13 @@ module.exports = function () {
         },
         'skip extension': function (input) {
             opt.skipext = true;
-            OK('extensions will be %v while deleting\n', 'ignored');
+            OK('extensions will be %v while removing\n', 'ignored');
 
             return input;
         },
         'include extension': function (input) {
             opt.skipext = false;
-            OK('extensions will be %v while deleting\n', 'included');
+            OK('extensions will be %v while removing\n', 'included');
 
             return input;
         },
