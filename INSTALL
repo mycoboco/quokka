@@ -2,9 +2,10 @@
   ===============================
 
   This package does not provide an automated way to build or install the program
-  because quokka runs on top of node.js that is a javascript interpreter (if you
-  want to know more about node.js, visit http://nodejs.org). The simplest way to
-  use quokka is just to run it using node.js as follows:
+  except using npm (see http://npmjs.org/package/quokka) because quokka runs on
+  top of node.js that is a javascript interpreter (if you want to know more
+  about node.js, visit http://nodejs.org). The simplest way to use quokka is
+  just to run it using node.js as follows:
 
     $ node quokka.js <files-to-rename>
 

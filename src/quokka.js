@@ -26,6 +26,7 @@ var extension = require('./extension');
 var insert = require('./insert');
 var del = require('./delete');
 var remove = require('./remove');
+var replace = require('./replace');
 
 var parseQStr = global.parseQStr;
 
@@ -592,6 +593,10 @@ var setGlobal = function (vars) {
         {
             name:        '#remove',
             constructor: remove
+        },
+        {
+            name:        '#replace',
+            constructor: replace
         }
     ]);
     names = ch.ruleNames();
