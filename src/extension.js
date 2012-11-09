@@ -67,9 +67,9 @@ module.exports = function () {
     var option = function () {
         var r;
 
-        r = (opt.newext)? 'change to `' + opt.newext.val + '\' ':
+        r = (opt.newext)? 'change extensions to `' + opt.newext.val + '\' ':
                           'keep'.val + ' the original ';
-        r += (opt.limit < 0)? 'not using'.val + ' limit':
+        r += (opt.limit < 0)? 'not'.val + ' using limit':
                               'limiting to ' + (opt.limit+'').val + ' character' +
                                   ((opt.limit > 1)? 's': '');
 
