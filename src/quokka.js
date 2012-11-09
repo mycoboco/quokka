@@ -163,8 +163,8 @@ var chain = function (init) {
         return this;
     };
 
-    // removes a rule from rule chain
-    var remove = function (idx) {
+    // drops a rule from rule chain
+    var drop = function (idx) {
         assert(_.isFinite(+idx));
         assert(+idx < ch.length);
 
@@ -242,7 +242,7 @@ var chain = function (init) {
         initial:    initial,
         final:      final,
         append:     append,
-        remove:     remove,
+        drop:       drop,
         move:       move,
         peek:       peek,
         ruleList:   ruleList,
@@ -602,7 +602,7 @@ var setGlobal = function (vars) {
             '  move <N> <M>      '.cmd + 'move rule #<N> to #<M>\n' +
             '  preview           '.cmd + 'dry-run renaming files\n' +
             '  quit              '.cmd + 'terminates quokka\n' +
-            '  remove <N>        '.cmd + 'remove rule #<N> from rule chain\n' +
+            '  drop <N>          '.cmd + 'drop rule #<N> from rule chain\n' +
             '  rename            '.cmd + 'rename files\n' +
             '  rules             '.cmd + 'show rule chain\n' +
             '  version           '.cmd + 'show version information\n');
@@ -826,13 +826,13 @@ var setGlobal = function (vars) {
             }
             return t[1];
         },
-        'remove': function (input) {
+        'drop': function (input) {
             var r = parseQStr(input), idx;
             idx = r[0].toInt();
             if (!_.isFinite(idx) || idx < 1 || idx >= ch.ruleLength()) {
                 ERR('invalid rule index\n');
             } else {
-                ch.remove(idx);
+                ch.drop(idx);
                 cmdset['rules']();
             }
             return r[1];
