@@ -78,7 +78,7 @@ module.exports = function () {
         assert(_.isString(opt.after));
 
         r = global.extension(name);
-        return r[0].replaceAllNew(opt.after, opt.after+opt.text) + r[1];
+        return r[0].replaceNew(opt.after, opt.after+opt.text, { all: true }) + r[1];
     };
 
     var _before = function (name) {
@@ -86,7 +86,7 @@ module.exports = function () {
         assert(_.isString(opt.before));
 
         r = global.extension(name);
-        return r[0].replaceAllNew(opt.before, opt.text+opt.before) + r[1];
+        return r[0].replaceNew(opt.before, opt.text+opt.before, { all: true }) + r[1];
     };
 
     var _rule = function (name) {

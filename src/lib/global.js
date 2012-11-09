@@ -55,10 +55,11 @@ Number.method('integer', function () {
 
 
 // replaceAll from string.js does not work for regex-like strings
-String.method('replaceAllNew', function(str1, str2, ignore)
+String.method('replaceNew', function(str1, str2, opt)
 {
-    return this.replace(new RegExp(str1.replace(/([\/\,\!\\\^\$\{\}\[\]\(\)\.\*\+\?\|\<\>\-\&])/g,"\\$&"),
-                                                (ignore?"gi":"g")),
+    return this.replace(new RegExp(
+                            str1.replace(/([\/\,\!\\\^\$\{\}\[\]\(\)\.\*\+\?\|\<\>\-\&])/g,"\\$&"),
+                            ((opt && opt.all)? 'g': '') + ((opt && opt.ignore)? 'i': '')),
                         (typeof(str2)=="string")?str2.replace(/\$/g,"$$$$"):str2);
 });
 
