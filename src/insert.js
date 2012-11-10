@@ -137,7 +137,7 @@ module.exports = function () {
             } else
                 opt.func = 'at';
             opt.at = +r[0];
-            OK('text will be appended after %v characters\n', +r[0]);
+            OK('text will be appended after %v character%s\n', +r[0], (r[0] > 1)? 's': '');
 
             return r[1];
         },
