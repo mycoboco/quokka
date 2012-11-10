@@ -103,9 +103,9 @@ module.exports = function () {
     // applies the rule to file names
     // src = [ { dir: 'dir name', file: 'file name' }, ... ]
     var affect = function (src) {
-        assert(_.isArray(src));
-
         var dst = [];
+
+        assert(_.isArray(src));
 
         for (var i = 0; i < src.length; i++)
             dst.push({

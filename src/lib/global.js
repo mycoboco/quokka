@@ -119,9 +119,10 @@ global.extension = function (name, n) {
 
 
 // inserts text into name according to opt
-// name = 'basename'
+// name = 'base name'
 // text = 'text to insert'
-// opt = { func, keephid, skipext, at, reverse, after, before }
+// opt = { func: 'function name', keephid: boolean, skipext: boolean, at: position number,
+//         reverse: boolean, after: 'text', before: 'text' }
 global.insert = function (name, text, opt) {
     var fset = {
         prefix: function () {

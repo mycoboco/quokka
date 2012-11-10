@@ -45,19 +45,15 @@ module.exports = function () {
     };
 
     var _rule = function (name) {
-        var e;
-
-        assert(_.isString(opt.text));
-
         return global.insert(name, opt.text, opt);
     };
 
     // applies the rule to file names
     // src = [ { dir: 'dir name', file: 'file name' }, ... ]
     var affect = function (src) {
-        assert(_.isArray(src));
-
         var dst = [];
+
+        assert(_.isArray(src));
 
         for (var i = 0; i < src.length; i++)
             dst.push({
