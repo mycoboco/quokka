@@ -27,6 +27,7 @@ var insert = require('./insert');
 var del = require('./delete');
 var remove = require('./remove');
 var replace = require('./replace');
+var serialize = require('./serialize');
 
 var parseQStr = global.parseQStr;
 
@@ -551,7 +552,7 @@ var setGlobal = function (vars) {
     var files, input, rules, names;
     var newset = [];
 
-    string.clobberPrototype();
+    string.extendPrototype();
 
     mc = mycolors({
         'err':  { abbr: 'e', color: 'red' },
@@ -597,6 +598,10 @@ var setGlobal = function (vars) {
         {
             name:        '#replace',
             constructor: replace
+        },
+        {
+            name:        '#serialize',
+            constructor: serialize
         }
     ]);
     names = ch.ruleNames();
