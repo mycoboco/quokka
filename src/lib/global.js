@@ -5,6 +5,8 @@
 var assert = require('assert');
 var _ = require('../node_modules/underscore');
 
+var global = exports;
+
 
 // add method to constructor
 Function.prototype.method = function (name, func) {
@@ -66,7 +68,7 @@ String.method('replaceNew', function(str1, str2, opt)
 
 // parses a quoted string
 // x = 'string to parse'
-exports.parseQStr = function (x) {
+global.parseQStr = function (x) {
     var ns = /[\S]+/g,
         esc = /\\(['|"|\\])/g;
     var q, s, e;
@@ -102,7 +104,7 @@ exports.parseQStr = function (x) {
 // gets extension of file name
 // name = 'base name'
 // n = max length of extension
-exports.extension = function (name, n) {
+global.extension = function (name, n) {
     var i;
 
     assert(_.isString(name));
@@ -116,8 +118,66 @@ exports.extension = function (name, n) {
 };
 
 
+// inserts text into name according to opt
+// name = 'basename'
+// text = 'text to insert'
+// opt = { func, keephid, skipext, at, reverse, after, before }
+global.insert = function (name, text, opt) {
+    var fset = {
+        prefix: function () {
+            assert(_.isString(name));
+
+            if (opt.keephid && name.charAt(0) === '.')
+                return '.' + text + name.substring(1);
+            else
+                return text + name;
+        },
+        suffix: function () {
+            assert(_.isString(name));
+
+            if (opt.skipext) {
+                var r = global.extension(name);
+                return r[0] + text + r[1];
+            } else
+               return name + text;
+        },
+        at: function () {
+            var r, at;
+
+            assert(_.isString(name));
+            assert(_.isFinite(opt.at));
+
+            r = global.extension(name);
+            at = (opt.reverse)? r[0].length - opt.at: opt.at;
+            return r[0].substring(0, at) + text + r[0].substring(at) + r[1];
+        },
+        after: function () {
+            assert(_.isString(name));
+            assert(_.isString(opt.after));
+
+            r = global.extension(name);
+            return r[0].replaceNew(opt.after, opt.after+text, { all: true }) + r[1];
+        },
+        before: function () {
+            assert(_.isString(name));
+            assert(_.isString(opt.before));
+
+            r = global.extension(name);
+            return r[0].replaceNew(opt.before, text+opt.before, { all: true }) + r[1];
+        }
+    };
+
+    assert(_.isString(name));
+    assert(_.isString(text));
+    assert(_.isObject(opt));
+    assert(_.isFunction(fset[opt.func]));
+
+    return fset[opt.func]();
+};
+
+
 // returns string for ordinal number
-exports.ordinal = function (n) {
+global.ordinal = function (n) {
     var m;
 
     assert(_.isFinite(n) && n > 0);

@@ -16,6 +16,7 @@ var parseQStr = global.parseQStr;
 module.exports = function () {
     var cmdset;
     var opt = {    // default: insert nothing as prefix
+        func:    'prefix',
         text:    '',
         skipext: true
     };
@@ -43,58 +44,12 @@ module.exports = function () {
         return cmdset;
     };
 
-    var _prefix = opt.func = function (name) {
-        assert(_.isString(name));
-
-        if (opt.keephid && name.charAt(0) === '.')
-            return '.' + opt.text + name.substring(1);
-        else
-            return opt.text + name;
-    };
-
-    var _suffix = function (name) {
-        assert(_.isString(name));
-
-        if (opt.skipext) {
-            var r = global.extension(name);
-            return r[0] + opt.text + r[1];
-        } else
-            return name + opt.text;
-    };
-
-    var _at = function (name) {
-        var r, at;
-
-        assert(_.isString(name));
-        assert(_.isFinite(opt.at));
-
-        r = global.extension(name);
-        at = (opt.reverse)? r[0].length - opt.at: opt.at;
-        return r[0].substring(0, at) + opt.text + r[0].substring(at) + r[1];
-    };
-
-    var _after = function (name) {
-        assert(_.isString(name));
-        assert(_.isString(opt.after));
-
-        r = global.extension(name);
-        return r[0].replaceNew(opt.after, opt.after+opt.text, { all: true }) + r[1];
-    };
-
-    var _before = function (name) {
-        assert(_.isString(name));
-        assert(_.isString(opt.before));
-
-        r = global.extension(name);
-        return r[0].replaceNew(opt.before, opt.text+opt.before, { all: true }) + r[1];
-    };
-
     var _rule = function (name) {
         var e;
 
         assert(_.isString(opt.text));
 
-        return opt.func(name);
+        return global.insert(name, opt.text, opt);
     };
 
     // applies the rule to file names
@@ -117,18 +72,18 @@ module.exports = function () {
     var option = function () {
         var where = function () {
             switch(opt.func) {
-                case _prefix:
+                case 'prefix':
                     return 'as ' + 'prefix'.val +
                            ((opt.keephid)? ' keeping'.val + ' hidden files'.val: '');
-                case _suffix:
+                case 'suffix':
                     return 'as ' + 'suffix'.val +
                            ((opt.skipext)? ' skipping'.val: ' including'.val) + ' extensions';
-                case _at:
+                case 'at':
                     return 'at ' + (''+opt.at).val +
                            ((opt.reverse)? ' counting ' + 'from right to left'.val: '');
-                case _after:
+                case 'after':
                     return 'after `' + opt.after.val + '\'';
-                case _before:
+                case 'before':
                     return 'before `' + opt.before.val + '\'';
                 default:
                     assert(false);
@@ -148,20 +103,20 @@ module.exports = function () {
             return r[1];
         },
         'as prefix': function (input) {
-            opt.func = _prefix;
+            opt.func = 'prefix';
             OK('text will be ' + 'prepended\n'.val);
 
             return input;
         },
         'as suffix': function (input) {
-            opt.func = _suffix;
+            opt.func = 'suffix';
             OK('text will be ' + 'appended\n'.val);
 
             return input;
         },
         'skip extension': function (input) {
             opt.skipext = true;
-            if (opt.func !== _suffix)
+            if (opt.func !== 'suffix')
                 WARN('`%c\' is meaningful only with `%c\'', 'skip extension', 'as suffix');
             OK('text will be appended ' + 'before extensions\n'.val);
 
@@ -169,7 +124,7 @@ module.exports = function () {
         },
         'include extension': function (input) {
             opt.skipext = false;
-            if (opt.func !== _suffix)
+            if (opt.func !== 'suffix')
                 WARN('`%c\' is meaningful only with `%c\'', 'including extension', 'as suffix');
             OK('text will be appended ' + 'to extensions\n'.val);
 
@@ -180,14 +135,14 @@ module.exports = function () {
                 ERR('invalid location `%v\'\n', r[0]);
                 r[0] = 0;
             } else
-                opt.func = _at;
+                opt.func = 'at';
             opt.at = +r[0];
             OK('text will be appended after %v characters\n', +r[0]);
 
             return r[1];
         },
         'right to left': function (input) {
-            if (opt.func !== _at)
+            if (opt.func !== 'at')
                 WARN('`%c\' is meaningful only with `%c\'', 'right to left', 'at');
             opt.reverse = true;
             OK('characters will be counted ' + 'from right to left\n'.val);
@@ -195,7 +150,7 @@ module.exports = function () {
             return input;
         },
         'left to right': function (input) {
-            if (opt.func !== _at)
+            if (opt.func !== 'at')
                 WARN('`%c\' is meaningful only with `%c\'', 'left to right', 'at');
             opt.reverse = false;
             OK('characters will be counted ' + 'from left to right\n'.val);
@@ -204,7 +159,7 @@ module.exports = function () {
         },
         'after': function (input) {
             var r = parseQStr(input);
-            opt.func = _after;
+            opt.func = 'after';
             opt.after = r[0];
             OK('text will be inserted after every `%v\'\n', opt.after);
 
@@ -212,7 +167,7 @@ module.exports = function () {
         },
         'before': function (input) {
             var r = parseQStr(input);
-            opt.func = _before;
+            opt.func = 'before';
             opt.before = r[0];
             OK('text will be inserted before every `%v\'\n', opt.before);
 
