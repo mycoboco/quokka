@@ -10,13 +10,13 @@
   how to rename files' extensions to '.node' using quokka:
 
     > #extension
-    entering `extension'
+    entering 'extension'
 
     #extension> change to node
-    file extensions will change to `node'
+    file extensions will change to 'node'
 
     #extension> preview
-    files will be renamed as follows when you type `done' and `rename'
+    files will be renamed as follows when you type 'done' and 'rename'
     ------------------------------------------------------------------
     ./global.js    | ./global.node
     ./mycolors.js  | ./mycolors.node
@@ -24,7 +24,7 @@
     ./wcwidth.js   | ./wcwidth.node
 
     #extension> done
-    files will be renamed as follows when you type `rename'
+    files will be renamed as follows when you type 'rename'
     -------------------------------------------------------
     ./global.js    | ./global.node
     ./mycolors.js  | ./mycolors.node
@@ -40,7 +40,7 @@
     ./wcwidth.js   | ./wcwidth.node   [ok]
 
     4 files successfully renamed
-    you need to `reset' file list and rules after `rename'
+    you need to 'reset' file list and rules after 'rename'
 
     > exit
 
