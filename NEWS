@@ -1,6 +1,10 @@
   What's New in quokka?
   =====================
 
+  2012-11-10  Serialize supported.
+  2012-11-09  Replace supported.
+  2012-11-09  Remove supported.
+  2012-11-09  `remove' changed to `drop'.
   2012-11-07  0.0.2 released.
   2012-11-07  Describe supported.
   2012-11-07  Delete supported.
