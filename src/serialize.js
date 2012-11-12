@@ -4,8 +4,8 @@
 
 var assert = require('assert');
 
-var _ = require('./node_modules/underscore');
-var string = require('./node_modules/string');
+var _ = require('../node_modules/underscore');
+var string = require('../node_modules/string');
 
 var global = require('./lib/global');
 

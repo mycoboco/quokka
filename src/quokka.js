@@ -8,13 +8,13 @@ var util = require('util');
 var path = require('path');
 var fs = require('fs');
 
-var _ = require('./node_modules/underscore');
-var argv = require('./node_modules/optimist')
+var _ = require('../node_modules/underscore');
+var argv = require('../node_modules/optimist')
                .boolean('v')
                .boolean('n')
                .argv;
-var string = require('./node_modules/string');
-var wcwidth = require('./node_modules/wcwidth.js')();
+var string = require('../node_modules/string');
+var wcwidth = require('../node_modules/wcwidth.js')();
 
 var alphanum = require('./lib/alphanum.js');
 var global = require('./lib/global');

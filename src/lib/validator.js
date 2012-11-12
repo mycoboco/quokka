@@ -5,8 +5,8 @@
 var assert = require('assert');
 var path = require('path');
 
-var _ = require('../node_modules/underscore');
-var string = require('../node_modules/string');
+var _ = require('../../node_modules/underscore');
+var string = require('../../node_modules/string');
 
 // validates file names
 // kind = 'system name'
