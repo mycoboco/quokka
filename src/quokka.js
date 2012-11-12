@@ -30,6 +30,7 @@ var replace = require('./replace');
 var serialize = require('./serialize');
 
 var parseQStr = global.parseQStr;
+var VERSION = '0.0.3b';
 
 
 // fills a path object
@@ -625,7 +626,7 @@ var setGlobal = function (vars) {
 
     var version = function () {
         //   12345678911234567892123456789312345678941234567895123456789612345678971234567898
-        OUT('quokka'.prog + ': an interactive file renamer 0.0.1\n%x',
+        OUT('quokka'.prog + ': an interactive file renamer ' + VERSION + '\n%x',
             'This is free software; see the LICENSE file for more information. There is NO\n' +
             'warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n' +
             'Written by Jun Woong\n');
