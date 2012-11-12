@@ -48,7 +48,7 @@
   user is editing the '#extension' rule. Typing 'help' shows what commands
   quokka accepts in general and in a specific rule mode. (In fact, quokka
   displays characters in color for readability; see
-  http://code.woong.org/quokka for screenshots.)
+  http://code.woong.org/quokka/img/sc.png for screenshots.)
 
   Even if its source code contains some stuff realted to MS Windows, it
   currently supports and is tested only for UNIX-like environments. For now,

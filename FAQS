@@ -15,7 +15,7 @@
 
   quokka can also accepts file names to rename from the contents of a file
   given through the -f option. For example, you can edit the file obtained
-  from `ls -t -1 > list.txt' (where the `-t' for sorting by modification time
+  from redirection of `ls -t -1' (where `-t' for sorting by modification time
   and `-1' for displaying only file names) and give it to quokka with the `-f'
   option.
 
