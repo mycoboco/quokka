@@ -153,7 +153,8 @@ module.exports = function () {
             OK('numbers will be appended ' + 'to extensions\n'.val);
 
             return input;
-        }, 'at': function (input) {
+        },
+        'at': function (input) {
             var r = parseQStr(input);
             if (!_.isFinite(+r[0]) || +r[0] < 0) {
                 ERR('invalid location `%v\'\n', r[0]);

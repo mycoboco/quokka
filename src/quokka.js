@@ -28,6 +28,7 @@ var del = require('./delete');
 var remove = require('./remove');
 var replace = require('./replace');
 var serialize = require('./serialize');
+var strip = require('./strip');
 
 var parseQStr = global.parseQStr;
 var VERSION = '0.0.3b';
@@ -603,6 +604,10 @@ var setGlobal = function (vars) {
         {
             name:        '#serialize',
             constructor: serialize
+        },
+        {
+            name:        '#strip',
+            constructor: strip
         }
     ]);
     names = ch.ruleNames();
