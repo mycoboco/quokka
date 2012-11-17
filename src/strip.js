@@ -30,9 +30,9 @@ module.exports = function () {
         console.log(
             'Commands for `#strip\' are:\n'.ok +
             '  strip <SET>            '.cmd + 'strip off characters in <SET>\n' +
-            '  digit                  '.cmd + 'strip off digits(%v)\n' +
-            '  punctuator             '.cmd + 'strip off punctuators\n' +
-            '  bracket                '.cmd + 'strip off brackets\n' +
+            '  digit                  '.cmd + 'strip off digits(' + preset.digit.val + ')\n' +
+            '  punctuator             '.cmd + 'strip off punctuators(' + preset.punc.val + ')\n' +
+            '  bracket                '.cmd + 'strip off brackets(' + preset.bracket.val + ')\n' +
             '  skip extension         '.cmd + 'ignore extensions while stripping off (default)\n' +
             '  include extension      '.cmd + 'strip off extensions if should\n');
     };
