@@ -16,17 +16,17 @@
   example, shows how to rename files' extensions to '.node' using quokka:
 
     > #extension
-    entering `#extension'
+    entering '#extension'
 
     #extension> change to node
-    file extensions will change to `node'
+    file extensions will change to 'node'
 
     #extension> preview
     current rule being edited
     -------------------------
-    change extensions to `node' not using limit
+    change extensions to 'node' not using limit
 
-    files will be renamed as follows when you type `done' and `rename'
+    files will be renamed as follows when you type 'done' and 'rename'
     ------------------------------------------------------------------
     ./alphanum.js  | ./alphanum.node
     ./global.js    | ./global.node
@@ -34,7 +34,7 @@
     ./validator.js | ./validator.node
 
     #extension> done
-    files will be renamed as follows when you type `rename'
+    files will be renamed as follows when you type 'rename'
     -------------------------------------------------------
     ./alphanum.js  | ./alphanum.node
     ./global.js    | ./global.node
@@ -50,7 +50,7 @@
     ./validator.js | ./validator.node [ok]
 
     4 files successfully renamed
-    you need to `reset' file list and rules after `rename'
+    you need to 'reset' file list and rules after 'rename'
 
     > exit
 
