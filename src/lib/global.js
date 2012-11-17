@@ -57,12 +57,19 @@ Number.method('integer', function () {
 
 
 // replaceAll from string.js does not work for regex-like strings
-String.method('replaceNew', function(str1, str2, opt)
-{
+String.method('replaceNew', function (str1, str2, opt) {
     return this.replace(new RegExp(
                             str1.replace(/([\/\,\!\\\^\$\{\}\[\]\(\)\.\*\+\?\|\<\>\-\&])/g,"\\$&"),
                             ((opt && opt.all)? 'g': '') + ((opt && opt.ignore)? 'i': '')),
                         (typeof(str2)=="string")?str2.replace(/\$/g,"$$$$"):str2);
+});
+
+
+// makes a string have title case
+String.method('toTitleCase', function () {
+    return this.replace(/\w[^_\s\.\-]*/g, function (txt) {
+        return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+    });
 });
 
 

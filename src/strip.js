@@ -44,7 +44,7 @@ module.exports = function () {
     };
 
     var _rule = function (name, n) {
-        var r = '';
+        var r;
         var regex = new RegExp('[' +
                         opt.set.replace(/([\/\,\!\\\^\$\{\}\[\]\(\)\.\*\+\?\|\<\>\-\&])/g,"\\$&") +
                         ']', 'g');

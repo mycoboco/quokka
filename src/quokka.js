@@ -29,6 +29,7 @@ var remove = require('./remove');
 var replace = require('./replace');
 var serialize = require('./serialize');
 var strip = require('./strip');
+var letterCase = require('./case');
 
 var parseQStr = global.parseQStr;
 var VERSION = '0.0.3b';
@@ -608,6 +609,10 @@ var setGlobal = function (vars) {
         {
             name:        '#strip',
             constructor: strip
+        },
+        {
+            name:        '#case',
+            constructor: letterCase,
         }
     ]);
     names = ch.ruleNames();
