@@ -86,4 +86,4 @@ the sorted array instead of nothing. If you need to replace that module with,
 say, a updated one, it is necessary to apply these changes properly.
 
 If you have a question or suggestion, do not hesitate to contact me via email
-(woong.jun@gmail.com) or web (http://code.woong.org/)
+(woong.jun at gmail.com) or web (http://code.woong.org/)
