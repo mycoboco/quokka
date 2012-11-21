@@ -20,7 +20,7 @@ It provides a set of rules:
 with options for fine control. You can combine these rules as you want by
 adding them into the rule chain. Editing each rule and the rule chain is
 performed interactively as you do in a shell prompt. The following, for
-example, shows how to rename files' extensions to '.node' using `quokka`:
+example, shows how to rename files' extensions to `.node` using `quokka`:
 
     > #extension
     entering '#extension'
