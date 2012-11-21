@@ -4,9 +4,7 @@ quokka: An Interactive File Renamer
 `quokka` is an interactive file renamer, which helps to rename multiple files
 in a systematic manner.
 
-<center>
-![quokka screenshot] (http://code.woong.org/quokka/img/sc.png)
-</center>
+<center><img src="http://code.woong.org/quokka/img/sc.png" /></center>
 
 It provides a set of rules:
 
@@ -88,4 +86,4 @@ the sorted array instead of nothing. If you need to replace that module with,
 say, a updated one, it is necessary to apply these changes properly.
 
 If you have a question or suggestion, do not hesitate to contact me via email
-<woong.jun@gmail.com> or web <http://code.woong.org/>
+(woong.jun@gmail.com) or web (http://code.woong.org/)
