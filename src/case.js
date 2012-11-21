@@ -26,11 +26,11 @@ module.exports = function () {
         console.log(
             'Commands for `#case\' are:\n'.ok +
             '  keep original          '.cmd + 'keep the original letter case\n' +
-            '  capitalize             '.cmd + 'make file names be title case\n' +
+            '  titlecase              '.cmd + 'make file names be title case\n' +
             '  lowercase              '.cmd + 'make file names be lower case\n' +
             '  uppercase              '.cmd + 'make file names be upper case\n' +
             '  invert                 '.cmd + 'invert letter case in file names\n' +
-            '  first upper            '.cmd + 'make only the first character be upper case\n' +
+            '  capitalize             '.cmd + 'make only the first character be upper case\n' +
             '  skip extension         '.cmd + 'ignore extensions while changing letter case\n' +
             '  include extension      '.cmd + 'include extensions while changing letter case\n' +
             '  lower extension        '.cmd + 'extensions will always be lower case\n');
@@ -54,7 +54,7 @@ module.exports = function () {
         switch (opt.func) {
             case 'original':
                 break;
-            case 'capitalize':
+            case 'title':
                 name = name.toTitleCase();
                 break;
             case 'lower':
@@ -68,7 +68,7 @@ module.exports = function () {
                     s += (name[i].isUpper())? name[i].toLowerCase(): name[i].toUpperCase();
                 name = s;
                 break;
-            case 'first':
+            case 'capitalize':
                 name = name.capitalize();
                 break;
             default:
@@ -106,7 +106,7 @@ module.exports = function () {
             case 'original':
                 s = 'keep the ' + 'original'.val + ' letter case';
                 break;
-            case 'capitalize':
+            case 'title':
                 s = 'make file names be ' + 'title'.val + ' case';
                 break;
             case 'lower':
@@ -118,7 +118,7 @@ module.exports = function () {
             case 'invert':
                 s = 'invert'.val + ' letter case';
                 break;
-            case 'first':
+            case 'capitalize':
                 s = 'make only the ' + 'first'.val + ' character be ' + 'upper'.val + ' case';
                 break;
             default:
@@ -151,8 +151,8 @@ module.exports = function () {
 
             return input;
         },
-        'capitalize': function (input) {
-            opt.func = 'capitalize';
+        'titlecase': function (input) {
+            opt.func = 'title';
             OK('file names will be %v case\n', 'title');
 
             return input;
@@ -175,8 +175,8 @@ module.exports = function () {
 
             return input;
         },
-        'first upper': function (input) {
-            opt.func = 'first';
+        'capitalize': function (input) {
+            opt.func = 'capitalize';
             OK('only %v character will be %v case\n', 'first', 'upper');
 
             return input;
