@@ -79,7 +79,8 @@ var chain = function (init) {
         rule = {}, cache;
 
     // registers or finds a rule
-    // entry = [ { name: 'rule name', constructor: function () {} }, ... ] or 'rule name to find'
+    // entry = [ { name: 'rule name', desc: 'description', constructor: function () {} }, ... ] or
+    //         'rule name to find'
     var rule = function (entry) {
         var i;
 
@@ -104,12 +105,18 @@ var chain = function (init) {
         return this;
     };
 
-    // gets names of registered rules
-    var ruleNames = function () {
+    // gets names/descriptions of registered rules
+    var ruleInfo = function () {
         if (cache)
             return cache;
 
-        cache = _.keys(rule);
+        cache = rule.foreach(function (name, memo) {
+            memo.push({
+                name: name,
+                desc: rule[name].desc
+            });
+            return memo;
+        }, []);
 
         return cache;
     };
@@ -244,7 +251,7 @@ var chain = function (init) {
 
     return {
         rule:       rule,
-        ruleNames:  ruleNames,
+        ruleInfo:   ruleInfo,
         initial:    initial,
         final:      final,
         append:     append,
@@ -552,8 +559,20 @@ var setGlobal = function (vars) {
     var ctx = context();
     var defPrompt = '> ',
         prompt = defPrompt;
-    var files, input, rules, names;
+    var files, input, rules, info, names;
     var newset = [];
+    var prepRule = function (r) {
+        assert(_.isArray(r));
+
+        return r.foreach(function (idx, memo) {
+            memo.push({
+                name:        '#' + r[idx].id,
+                desc:        r[idx].desc,
+                constructor: r[idx]
+            });
+            return memo;
+        }, []);
+    };
 
     string.extendPrototype();
 
@@ -581,43 +600,24 @@ var setGlobal = function (vars) {
     assert(_.isArray(files));
 
     ch = chain(files);
-    ch.rule([
-        {
-            name:        '#extension',
-            constructor: extension
-        },
-        {
-            name:        '#insert',
-            constructor: insert
-        },
-        {
-            name:        '#delete',
-            constructor: del
-        },
-        {
-            name:        '#remove',
-            constructor: remove
-        },
-        {
-            name:        '#replace',
-            constructor: replace
-        },
-        {
-            name:        '#serialize',
-            constructor: serialize
-        },
-        {
-            name:        '#strip',
-            constructor: strip
-        },
-        {
-            name:        '#case',
-            constructor: letterCase,
-        }
-    ]);
-    names = ch.ruleNames();
+    ch.rule(prepRule([
+        extension,
+        insert,
+        del,
+        remove,
+        replace,
+        serialize,
+        strip,
+        letterCase
+    ]));
+    info = ch.ruleInfo().sort(function (a, b) {
+        return a.name > b.name;
+    });
+    names = info.collect('name');
 
     var help = function () {
+        var n;
+
         //   12345678911234567892123456789312345678941234567895123456789612345678971234567898
         OUT('Global commands are:\n'.ok +
             '  cancel            '.cmd + 'discard the rule being edited\n' +
@@ -632,6 +632,14 @@ var setGlobal = function (vars) {
             '  rename            '.cmd + 'rename files\n' +
             '  rules             '.cmd + 'show rule chain\n' +
             '  version           '.cmd + 'show version information\n');
+
+        if (!ctx.isSet()) {    // describes rules
+            n = max(info.collect('name')) + 6;
+            OK('Supported rules are:'.ok);
+            for (var i = 0; i < info.length; i++)
+                OUT('  ' + pad(info[i].name, n).cmd + info[i].desc);
+            OUT('');
+        }
     };
 
     var version = function () {

@@ -150,4 +150,9 @@ module.exports = function () {
     };
 };
 
+
+// name and description for rule
+module.exports.id = 'strip';
+module.exports.desc = 'strip a set of characters off';
+
 // end of strip.js

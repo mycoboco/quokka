@@ -181,4 +181,9 @@ module.exports = function () {
     };
 };
 
+
+// name and description for rule
+module.exports.id = 'insert';
+module.exports.desc = 'insert a text into a specified position';
+
 // end of insert.js

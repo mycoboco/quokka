@@ -234,4 +234,9 @@ module.exports = function () {
     };
 };
 
+
+// name and description for rule
+module.exports.id = 'delete';
+module.exports.desc = 'delete characters at a specified position';
+
 // end of delete.js

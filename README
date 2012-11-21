@@ -3,13 +3,14 @@
 
   quokka is an interactive file renamer, which helps to rename multiple files
   in a systematic manner. It provides a set of rules:
-    - to change extensions
-    - to insert a text into a specified position
-    - to delete characters at a specified position
-    - to remove a text
-    - to replace a text
-    - to serialize file names
-    - to strip a set of characters off
+    - to change letter case (#case)
+    - to delete characters at a specified position (#delete)
+    - to change file extensions (#extension)
+    - to insert a text into a specified position (#insert)
+    - to remove a text (#remove)
+    - to replace a text (#replace)
+    - to serialize file names (#serialize) and
+    - to strip a set of characters off (#strip)
   with options for fine control. You can combine these rules as you want by
   adding them into the rule chain. Editing each rule and the rule chain is
   performed interactively as you do in a shell prompt. The following, for

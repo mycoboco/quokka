@@ -190,4 +190,9 @@ module.exports = function () {
     };
 };
 
+
+// name and description for rule
+module.exports.id = 'replace';
+module.exports.desc = 'replace a text';
+
 // end of replace.js

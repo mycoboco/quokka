@@ -221,4 +221,9 @@ module.exports = function () {
     };
 };
 
+
+// name and description for rule
+module.exports.id = 'serialize';
+module.exports.desc = 'serialize file names';
+
 // end of serialize.js

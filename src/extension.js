@@ -113,4 +113,9 @@ module.exports = function () {
     };
 };
 
+
+// name and description for rule
+module.exports.id = 'extension';
+module.exports.desc = 'change file extensions';
+
 // end of extension.js

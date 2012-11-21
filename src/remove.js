@@ -185,4 +185,9 @@ module.exports = function () {
     };
 };
 
+
+// name and description for rule
+module.exports.id = 'remove';
+module.exports.desc = 'remove a text';
+
 // end of remove.js

@@ -211,4 +211,9 @@ module.exports = function () {
     };
 };
 
+
+// name and description for rule
+module.exports.id = 'case';
+module.exports.desc = 'change letter case';
+
 // end of case.js
