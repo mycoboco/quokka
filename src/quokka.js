@@ -32,7 +32,7 @@ var strip = require('./strip');
 var letterCase = require('./case');
 
 var parseQStr = global.parseQStr;
-var VERSION = '0.0.3b';
+var VERSION = '0.0.4';
 
 
 // fills a path object
