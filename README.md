@@ -54,14 +54,6 @@ example, shows how to rename files' extensions to `.node` using `quokka`:
     ./alphanum.js  | ./alphanum.node  [ok]
     ./global.js    | ./global.node    [ok]
     ./mycolors.js  | ./mycolors.node  [ok]
-    ./validator.js | ./validator.node
-
-    > rename
-    files are being renamed
-    -----------------------
-    ./alphanum.js  | ./alphanum.node  [ok]
-    ./global.js    | ./global.node    [ok]
-    ./mycolors.js  | ./mycolors.node  [ok]
     ./validator.js | ./validator.node [ok]
 
     4 files successfully renamed
