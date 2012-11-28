@@ -4,7 +4,7 @@ quokka: An Interactive File Renamer
 `quokka` is an interactive file renamer, which helps to rename multiple files
 in a systematic manner.
 
-<center><img src="http://code.woong.org/quokka/img/sc.png" /></center>
+![quokka's screenshot](http://code.woong.org/img/quokka-sc.png)
 
 It provides a set of rules:
 
@@ -70,7 +70,8 @@ Even if its source code contains some stuff realted to MS Windows, it currently
 supports and is tested only for UNIX-like environments. For now, nothing is
 guranteed for MS Windows.
 
-For the copyright issues, see the accompanying `LICENSE` file.
+`INSTALL.md` explains how to build and install the program. For the copyright
+issues, see the accompanying `LICENSE.md` file.
 
 Among libraries used, `alphanum.js` has been modified to meet `quokka`'s needs;
 it has been modified to behave in a more similar way to `ls -v` and to return
@@ -78,4 +79,4 @@ the sorted array instead of nothing. If you need to replace that module with,
 say, a updated one, it is necessary to apply these changes properly.
 
 If you have a question or suggestion, do not hesitate to contact me via email
-(woong.jun at gmail.com) or web (http://code.woong.org/)
+(woong.jun at gmail.com) or web (http://code.woong.org/).
