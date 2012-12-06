@@ -4,7 +4,13 @@ quokka: An Interactive File Renamer
 `quokka` is an interactive file renamer, which helps to rename multiple files
 in a systematic manner.
 
-![quokka's screenshot](http://code.woong.org/img/quokka-sc.png)
+  <div class="center">
+    <a href="http://code.woong.org/img/quokka-sc.png">
+      <img src="http://code.woong.org/img/quokka-sc.png"
+        alt="quokka's screenshot"
+        style="display:block; margin-left:auto; margin-right:auto" />
+    </a>
+  </div>
 
 It provides a set of rules:
 
