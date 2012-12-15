@@ -5,11 +5,8 @@
 var assert = require('assert');
 
 var _ = require('../node_modules/underscore');
-var string = require('../node_modules/string');
 
 var global = require('./lib/global');
-
-var parseQStr = global.parseQStr;
 
 
 // rule for delete
@@ -144,87 +141,92 @@ module.exports = function () {
     };
 
     cmdset = {
-        'from position': function (input) {
-            var r = parseQStr(input);
-            if (!_.isFinite(+r[0]) || +r[0] < 0) {
-                ERR('invalid location `%v\'\n', r[0]);
-                r[0] = 0;
+        'from position': {
+            spec: [ 'from', 'position', '#' ],
+            func: function (param) {
+                if (!_.isFinite(+param[0]) || +param[0] < 0) {
+                    ERR('invalid location `%v\'\n', param[0]);
+                    param[0] = 0;
+                }
+                opt.from = +param[0];
+                OK('text will be deleted from the %v character\n', global.ordinal(opt.from+1));
             }
-            opt.from = +r[0];
-            OK('text will be deleted from the %v character\n', global.ordinal(opt.from+1));
-
-            return r[1];
         },
-        'from delimiter': function (input) {
-            var r = parseQStr(input);
-            opt.from = r[0];
-            OK('text will be deleted from `%v\'\n', r[0]);
-
-            return r[1];
-        },
-        'until count': function (input) {
-            var r = parseQStr(input);
-            if (!_.isFinite(+r[0]) || +r[0] < 0) {
-                ERR('invalid count `%v\'\n', r[0]);
-                r[0] = 0;
+        'from delimiter': {
+            spec: [ 'from', 'delimiter', '$' ],
+            func: function (param) {
+                opt.from = param[0];
+                OK('text will be deleted from `%v\'\n', param[0]);
             }
-            opt.until = +r[0];
-            OK('%v character%s will be deleted\n', opt.until, (opt.until > 1)? 's': '');
-
-            return r[1];
         },
-        'until delimiter': function (input) {
-            var r = parseQStr(input);
-            opt.until = r[0];
-            OK('text will be deleted until `%v\' encountered\n', r[0]);
-
-            return r[1];
+        'until count': {
+            spec: [ 'until', 'count', '#' ],
+            func: function (param) {
+                if (!_.isFinite(+param[0]) || +param[0] < 0) {
+                    ERR('invalid count `%v\'\n', param[0]);
+                    param[0] = 0;
+                }
+                opt.until = +param[0];
+                OK('%v character%s will be deleted\n', opt.until, (opt.until > 1)? 's': '');
+            }
         },
-        'until end': function (input) {
-            opt.until = NaN;
-            OK('text will be deleted until ' + 'the end\n'.val);
-
-            return input;
+        'until delimiter': {
+            spec: [ 'until', 'delimiter', '$' ],
+            func: function (param) {
+                opt.until = param[0];
+                OK('text will be deleted until `%v\' encountered\n', param[0]);
+            }
         },
-        'skip extension': function (input) {
-            opt.skipext = true;
-            OK('extensions will be %v while deleting\n', 'ignored');
-
-            return input;
+        'until end': {
+            spec: [ 'until', 'end' ],
+            func: function () {
+                opt.until = NaN;
+                OK('text will be deleted until ' + 'the end\n'.val);
+            }
         },
-        'include extension': function (input) {
-            opt.skipext = false;
-            OK('extensions will be %v while deleting\n', 'included');
-
-            return input;
+        'skip extension': {
+            spec: [ 'skip', 'extension' ],
+            func: function () {
+                opt.skipext = true;
+                OK('extensions will be %v while deleting\n', 'ignored');
+            }
         },
-        'right to left': function (input) {
-            opt.reverse = true;
-            OK('characters will be counted ' + 'from right to left\n'.val);
-
-            return input;
+        'include extension': {
+            spec: [ 'include', 'extension' ],
+            func: function () {
+                opt.skipext = false;
+                OK('extensions will be %v while deleting\n', 'included');
+            }
         },
-        'left to right': function (input) {
-            opt.reverse = false;
-            OK('characters will be counted ' + 'from left to right\n'.val);
-
-            return input;
+        'right to left': {
+            spec: [ 'right', 'to', 'left' ],
+            func: function () {
+                opt.reverse = true;
+                OK('characters will be counted ' + 'from right to left\n'.val);
+            }
         },
-        'skip delimiter': function (input) {
-            opt.delimiter = false;
-            OK('delimiter will %v be deleted\n', 'not');
-
-            return input;
+        'left to right': {
+            spec: [ 'left', 'to', 'right' ],
+            func: function () {
+                opt.reverse = false;
+                OK('characters will be counted ' + 'from left to right\n'.val);
+            }
         },
-        'include delimiter': function (input) {
-            opt.delimiter = true;
-            OK('delimiter will %v deleted\n', 'be');
-
-            return input;
+        'skip delimiter': {
+            spec: [ 'skip', 'delimiter' ],
+            func: function () {
+                opt.delimiter = false;
+                OK('delimiter will %v be deleted\n', 'not');
+            }
+        },
+        'include delimiter': {
+            spec: [ 'include', 'delimiter' ],
+            func: function () {
+                opt.delimiter = true;
+                OK('delimiter will %v deleted\n', 'be');
+            }
         },
     };
-
-    COMPLETER.add(_.keys(cmdset).alphanumSort());
 
     return {
         help:       help,

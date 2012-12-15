@@ -8,31 +8,51 @@ var _ = require('../../node_modules/underscore');
 var global = exports;
 
 
-// add method to constructor
+// adds method to constructor
 Function.prototype.method = function (name, func) {
     this.prototype[name] = func;
     return this;
 };
 
 
-// run closure for each property
+// runs closure for each property
 Object.method('foreach', function (closure, init) {
     var i,
         memo = init,
         keys = Object.keys(this);
 
     for (i = 0; i < keys.length; i++)
+        if (keys[i] !== 'foreach')
         memo = closure.call(this, keys[i], memo);
 
     return memo;
 });
 
 
+// clone from underscore.js copies properties from prototype link
+Object.method('clone', function () {
+    return this.foreach(function (key, memo) {
+        memo[key] = this[key];
+        return memo;
+    }, {});
+});
+
+
+// extend from underscore.js merges properties from prototype link
+Object.method('merge', function (obj) {
+    var that = this;
+
+    obj.foreach(function (key) {
+        that[key] = this[key];
+    });
+
+    return that;
+});
+
+
 // processes an array
 Array.method('process', function (closure) {
-    var i;
-
-    for (i = 0; i < this.length; i++)
+    for (var i = 0; i < this.length; i++)
         this[i] = closure.call(this, this[i], i);
 
     return this;
@@ -71,41 +91,6 @@ String.method('toTitleCase', function () {
         return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
     });
 });
-
-
-// parses a quoted string
-// x = 'string to parse'
-global.parseQStr = function (x) {
-    var ns = /[\S]+/g,
-        esc = /\\(['|"|\\])/g;
-    var q, s, e;
-
-    assert(_.isString(x));
-
-    x = x.trim();
-
-    if (!x)
-        return [ '', '' ];
-    else if (x.indexOf('\'') >= 0)
-        q = '\'';
-    else if (x.indexOf('"') >= 0)
-        q = '"';
-    if (!q)
-        return [ ns.exec(x)[0], x.substring(ns.lastIndex) ];
-
-    x = x.substring(1);    // skips quote
-    s = 0;
-    do {
-        e = x.indexOf(q, s);
-        if (e < 0) {
-            err('closing %s is missing\n', q);
-            return [ x, '' ];
-        }
-        s = e + 1;
-    } while(x.charAt(e-1) === '\\');
-
-    return [ x.substring(0, e).replace(esc, '$1'), x.substring(e+1) ];
-};
 
 
 // gets extension of file name

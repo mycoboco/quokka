@@ -5,11 +5,8 @@
 var assert = require('assert');
 
 var _ = require('../node_modules/underscore');
-var string = require('../node_modules/string');
 
 var global = require('./lib/global');
-
-var parseQStr = global.parseQStr;
 
 
 // rule for serialize
@@ -104,114 +101,119 @@ module.exports = function () {
     };
 
     cmdset = {
-        'start': function (input) {
-            var r = parseQStr(input);
-            if (!_.isFinite(+r[0])) {
-                ERR('invalid starting number `%v\'\n', r[0]);
-                r[0] = 1;
+        'start': {
+            spec: [ 'start', '#' ],
+            func: function (param) {
+                if (!_.isFinite(+param[0])) {
+                    ERR('invalid starting number `%v\'\n', param[0]);
+                    param[0] = 1;
+                }
+                opt.start = +param[0];
+                OK('numbers will start with %v\n', opt.start);
             }
-            opt.start = +r[0];
-            OK('numbers will start with %v\n', opt.start);
-
-            return r[1];
         },
-        'step': function (input) {
-            var r = parseQStr(input);
-            if (!_.isFinite(+r[0])) {
-                ERR('invalid step number `%v\'\n', r[0]);
-                r[0] = 1;
+        'step': {
+            spec: [ 'step', '#' ],
+            func: function (param) {
+                if (!_.isFinite(+param[0])) {
+                    ERR('invalid step number `%v\'\n', param[0]);
+                    param[0] = 1;
+                }
+                opt.step = +param[0];
+                OK('numbers will go with a step of %v\n', opt.step);
             }
-            opt.step = +r[0];
-            OK('numbers will go with a step of %v\n', opt.step);
-
-            return r[1];
         },
-        'as prefix': function (input) {
-            opt.func = 'prefix';
-            OK('numbers will be ' + 'prepended\n'.val);
-
-            return input;
-        },
-        'as suffix': function (input) {
-            opt.func = 'suffix';
-            OK('numbers will be ' + 'appended\n'.val);
-
-            return input;
-        },
-        'skip extension': function (input) {
-            opt.skipext = true;
-            if (opt.func !== 'suffix')
-                WARN('`%c\' is meaningful only with `%c\'', 'skip extension', 'as suffix');
-            OK('numbers will be appended ' + 'before extensions\n'.val);
-
-            return input;
-        },
-        'include extension': function (input) {
-            opt.skipext = false;
-            if (opt.func !== 'suffix')
-                WARN('`%c\' is meaningful only with `%c\'', 'including extension', 'as suffix');
-            OK('numbers will be appended ' + 'to extensions\n'.val);
-
-            return input;
-        },
-        'at': function (input) {
-            var r = parseQStr(input);
-            if (!_.isFinite(+r[0]) || +r[0] < 0) {
-                ERR('invalid location `%v\'\n', r[0]);
-                r[0] = 0;
-            } else
-                opt.func = 'at';
-            opt.at = +r[0];
-            OK('numbers will be appended after %v characters\n', +r[0]);
-
-            return r[1];
-        },
-        'right to left': function (input) {
-            if (opt.func !== 'at')
-                WARN('`%c\' is meaningful only with `%c\'', 'right to left', 'at');
-            opt.reverse = true;
-            OK('characters will be counted ' + 'from right to left\n'.val);
-
-            return input;
-        },
-        'left to right': function (input) {
-            if (opt.func !== 'at')
-                WARN('`%c\' is meaningful only with `%c\'', 'left to right', 'at');
-            opt.reverse = false;
-            OK('characters will be counted ' + 'from left to right\n'.val);
-
-            return input;
-        },
-        'after': function (input) {
-            var r = parseQStr(input);
-            opt.func = 'after';
-            opt.after = r[0];
-            OK('numbers will be inserted after every `%v\'\n', opt.after);
-
-            return r[1];
-        },
-        'before': function (input) {
-            var r = parseQStr(input);
-            opt.func = 'before';
-            opt.before = r[0];
-            OK('numbers will be inserted before every `%v\'\n', opt.before);
-
-            return r[1];
-        },
-        'pad': function (input) {
-            var r = parseQStr(input);
-            if (!_.isFinite(+r[0]) || +r[0] < 0) {
-                ERR('invalid padding length `%v\'\n', r[0]);
-                r[0] = 1;
+        'as prefix': {
+            spec: [ 'as', 'prefix' ],
+            func: function () {
+                opt.func = 'prefix';
+                OK('numbers will be ' + 'prepended\n'.val);
             }
-            opt.pad = +r[0];
-            OK('numbers will be padded to be %v-digit\n', +r[0]);
-
-            return r[1];
+        },
+        'as suffix': {
+            spec: [ 'as', 'suffix' ],
+            func: function () {
+                opt.func = 'suffix';
+                OK('numbers will be ' + 'appended\n'.val);
+            }
+        },
+        'skip extension': {
+            spec: [ 'skip', 'extension' ],
+            func: function () {
+                opt.skipext = true;
+                if (opt.func !== 'suffix')
+                    WARN('`%c\' is meaningful only with `%c\'', 'skip extension', 'as suffix');
+                OK('numbers will be appended ' + 'before extensions\n'.val);
+            }
+        },
+        'include extension': {
+            spec: [ 'include', 'extension' ],
+            func: function () {
+                opt.skipext = false;
+                if (opt.func !== 'suffix')
+                    WARN('`%c\' is meaningful only with `%c\'',
+                         'including extension', 'as suffix');
+                OK('numbers will be appended ' + 'to extensions\n'.val);
+            }
+        },
+        'at': {
+            spec: [ 'at', '#' ],
+            func: function (param) {
+                if (!_.isFinite(+param[0]) || +param[0] < 0) {
+                    ERR('invalid location `%v\'\n', param[0]);
+                    param[0] = 0;
+                } else
+                    opt.func = 'at';
+                opt.at = +param[0];
+                OK('numbers will be appended after %v characters\n', +paran[0]);
+            }
+        },
+        'right to left': {
+            spec: [ 'right', 'to', 'left' ],
+            func: function () {
+                if (opt.func !== 'at')
+                    WARN('`%c\' is meaningful only with `%c\'', 'right to left', 'at');
+                opt.reverse = true;
+                OK('characters will be counted ' + 'from right to left\n'.val);
+            }
+        },
+        'left to right': {
+            spec: [ 'left', 'to', 'right' ],
+            func: function () {
+                if (opt.func !== 'at')
+                    WARN('`%c\' is meaningful only with `%c\'', 'left to right', 'at');
+                opt.reverse = false;
+                OK('characters will be counted ' + 'from left to right\n'.val);
+            }
+        },
+        'after': {
+            spec: [ 'after', '$' ],
+            func: function (param) {
+                opt.func = 'after';
+                opt.after = param[0];
+                OK('numbers will be inserted after every `%v\'\n', opt.after);
+            }
+        },
+        'before': {
+            spec: [ 'before', '$' ],
+            func: function (param) {
+                opt.func = 'before';
+                opt.before = param[0];
+                OK('numbers will be inserted before every `%v\'\n', opt.before);
+            }
+        },
+        'pad': {
+            spec: [ 'pad', '#' ],
+            func: function (param) {
+                if (!_.isFinite(+param[0]) || +param[0] < 0) {
+                    ERR('invalid padding length `%v\'\n', param[0]);
+                    param[0] = 1;
+                }
+                opt.pad = +param[0];
+                OK('numbers will be padded to be %v-digit\n', +param[0]);
+            }
         }
     };
-
-    COMPLETER.add(_.keys(cmdset).alphanumSort());
 
     return {
         help:       help,

@@ -5,11 +5,8 @@
 var assert = require('assert');
 
 var _ = require('../node_modules/underscore');
-var string = require('../node_modules/string');
 
 var global = require('./lib/global');
-
-var parseQStr = global.parseQStr;
 
 
 // rule for insert
@@ -91,87 +88,95 @@ module.exports = function () {
     };
 
     cmdset = {
-        'insert': function (input) {
-            var r = parseQStr(input);
-            opt.text = r[0];
-            OK('`%v\' will be inserted\n', opt.text);
-
-            return r[1];
+        'insert': {
+            spec: [ 'insert', '$' ],
+            func: function (param) {
+                opt.text = param[0];
+                OK('`%v\' will be inserted\n', opt.text);
+            }
         },
-        'as prefix': function (input) {
-            opt.func = 'prefix';
-            OK('text will be ' + 'prepended\n'.val);
-
-            return input;
+        'as prefix': {
+            spec: [ 'as', 'prefix' ],
+            func: function () {
+                opt.func = 'prefix';
+                OK('text will be ' + 'prepended\n'.val);
+            }
         },
-        'as suffix': function (input) {
-            opt.func = 'suffix';
-            OK('text will be ' + 'appended\n'.val);
-
-            return input;
+        'as suffix': {
+            spec: [ 'as', 'suffix' ],
+            func: function () {
+                opt.func = 'suffix';
+                OK('text will be ' + 'appended\n'.val);
+            }
         },
-        'skip extension': function (input) {
-            opt.skipext = true;
-            if (opt.func !== 'suffix')
-                WARN('`%c\' is meaningful only with `%c\'', 'skip extension', 'as suffix');
-            OK('text will be appended ' + 'before extensions\n'.val);
-
-            return input;
+        'skip extension': {
+            spec: [ 'skip', 'extension' ],
+            func: function () {
+                opt.skipext = true;
+                if (opt.func !== 'suffix')
+                    WARN('`%c\' is meaningful only with `%c\'', 'skip extension', 'as suffix');
+                OK('text will be appended ' + 'before extensions\n'.val);
+            }
         },
-        'include extension': function (input) {
-            opt.skipext = false;
-            if (opt.func !== 'suffix')
-                WARN('`%c\' is meaningful only with `%c\'', 'including extension', 'as suffix');
-            OK('text will be appended ' + 'to extensions\n'.val);
-
-            return input;
-        }, 'at': function (input) {
-            var r = parseQStr(input);
-            if (!_.isFinite(+r[0]) || +r[0] < 0) {
-                ERR('invalid location `%v\'\n', r[0]);
-                r[0] = 0;
-            } else
-                opt.func = 'at';
-            opt.at = +r[0];
-            OK('text will be appended after %v character%s\n', +r[0], (r[0] > 1)? 's': '');
-
-            return r[1];
+        'include extension': {
+            spec: [ 'include', 'extension' ],
+            func: function () {
+                opt.skipext = false;
+                if (opt.func !== 'suffix')
+                    WARN('`%c\' is meaningful only with `%c\'', 'including extension',
+                         'as suffix');
+                OK('text will be appended ' + 'to extensions\n'.val);
+            }
         },
-        'right to left': function (input) {
-            if (opt.func !== 'at')
-                WARN('`%c\' is meaningful only with `%c\'', 'right to left', 'at');
-            opt.reverse = true;
-            OK('characters will be counted ' + 'from right to left\n'.val);
-
-            return input;
+        'at': {
+            spec: [ 'at', '#' ],
+            func: function (param) {
+                var r = parseQStr(input);
+                if (!_.isFinite(+param[0]) || +param[0] < 0) {
+                    ERR('invalid location `%v\'\n', param[0]);
+                    param[0] = 0;
+                } else
+                    opt.func = 'at';
+                opt.at = +param[0];
+                OK('text will be appended after %v character%s\n', +param[0],
+                   (param[0] > 1)? 's': '');
+            }
         },
-        'left to right': function (input) {
-            if (opt.func !== 'at')
-                WARN('`%c\' is meaningful only with `%c\'', 'left to right', 'at');
-            opt.reverse = false;
-            OK('characters will be counted ' + 'from left to right\n'.val);
-
-            return input;
+        'right to left': {
+            spec: [ 'right', 'to', 'left' ],
+            func: function () {
+                if (opt.func !== 'at')
+                    WARN('`%c\' is meaningful only with `%c\'', 'right to left', 'at');
+                opt.reverse = true;
+                OK('characters will be counted ' + 'from right to left\n'.val);
+            }
         },
-        'after': function (input) {
-            var r = parseQStr(input);
-            opt.func = 'after';
-            opt.after = r[0];
-            OK('text will be inserted after every `%v\'\n', opt.after);
-
-            return r[1];
+        'left to right': {
+            spec: [ 'left', 'to', 'left' ],
+            func: function () {
+                if (opt.func !== 'at')
+                    WARN('`%c\' is meaningful only with `%c\'', 'left to right', 'at');
+                opt.reverse = false;
+                OK('characters will be counted ' + 'from left to right\n'.val);
+            }
         },
-        'before': function (input) {
-            var r = parseQStr(input);
-            opt.func = 'before';
-            opt.before = r[0];
-            OK('text will be inserted before every `%v\'\n', opt.before);
-
-            return r[1];
+        'after': {
+            spec: [ 'after', '$' ],
+            func: function (param) {
+                opt.func = 'after';
+                opt.after = param[0];
+                OK('text will be inserted after every `%v\'\n', opt.after);
+            }
+        },
+        'before': {
+            spec: [ 'before', '$' ],
+            func: function (param) {
+                opt.func = 'before';
+                opt.before = param[0];
+                OK('text will be inserted before every `%v\'\n', opt.before);
+            }
         },
     };
-
-    COMPLETER.add(_.keys(cmdset).alphanumSort());
 
     return {
         help:       help,

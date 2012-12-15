@@ -8,8 +8,6 @@ var _ = require('../node_modules/underscore');
 
 var global = require('./lib/global');
 
-var parseQStr = global.parseQStr;
-
 
 // rule for strip
 module.exports = function () {
@@ -101,46 +99,49 @@ module.exports = function () {
     };
 
     cmdset = {
-        'digit': function (input) {
-            opt.set = preset.digit;
-            OK('digits(%v) will be stripped off\n', opt.set);
-
-            return input;
+        'digit': {
+            spec: [ 'digit' ],
+            func: function () {
+                opt.set = preset.digit;
+                OK('digits(%v) will be stripped off\n', opt.set);
+            }
         },
-        'punctuator': function (input) {
-            opt.set = preset.punc;
-            OK('punctuators(%v) will be stripped off\n', opt.set);
-
-            return input;
+        'punctuator': {
+            spec: [ 'punctuator' ],
+            func: function () {
+                opt.set = preset.punc;
+                OK('punctuators(%v) will be stripped off\n', opt.set);
+            }
         },
-        'bracket': function (input) {
-            opt.set = preset.bracket;
-            OK('brackets(%v) will be stripped off\n', opt.set);
-
-            return input;
+        'bracket': {
+            spec: [ 'bracket' ],
+            func: function () {
+                opt.set = preset.bracket;
+                OK('brackets(%v) will be stripped off\n', opt.set);
+            }
         },
-        'skip extension': function (input) {
-            opt.skipext = true;
-            OK('extensions will be %v while stripping off\n', 'ignores');
-
-            return input;
+        'skip extension': {
+            spec: [ 'skip', 'extension' ],
+            func: function () {
+                opt.skipext = true;
+                OK('extensions will be %v while stripping off\n', 'ignores');
+            }
         },
-        'include extension': function (input) {
-            opt.skipext = false;
-            OK('extensions will be %v while stripping off\n', 'included');
-
-            return input;
+        'include extension': {
+            spec: [ 'include', 'extension' ],
+            func: function () {
+                opt.skipext = false;
+                OK('extensions will be %v while stripping off\n', 'included');
+            }
         },
-        'strip': function (input) {
-            var r = parseQStr(input);
-            opt.set = r[0];
-            OK('user-defined chars(%v) will be stripped off\n', opt.set);
-
-            return r[1];
+        'strip': {
+            spec: [ 'strip', '#' ],
+            func: function (param) {
+                opt.set = param[0];
+                OK('user-defined chars(%v) will be stripped off\n', opt.set);
+            }
         }
     };
-
-    COMPLETER.add(_.keys(cmdset).alphanumSort());
 
     return {
         help:       help,

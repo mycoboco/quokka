@@ -8,8 +8,6 @@ var _ = require('../node_modules/underscore');
 
 var global = require('./lib/global');
 
-var parseQStr = global.parseQStr;
-
 
 // rule for extension
 module.exports = function () {
@@ -77,33 +75,33 @@ module.exports = function () {
     };
 
     cmdset = {
-        'change to': function (input) {
-            var r = parseQStr(input);
-            OK('file extensions will change to `%v\'\n', r[0]);
-            opt.newext = r[0];
-
-            return r[1];
-        },
-        'limit': function (input) {
-            var r = parseQStr(input);
-            if (r[0] === 'off') {
-                OK('every extension will be affected\n');
-                opt.limit = -1
-            } else {
-                opt.limit = r[0].toInt();
-                if (!_.isFinite(opt.limit) || opt.limit < 0) {
-                    ERR('invalid limit value\n');
-                    opt.limit = -1;
-                } else
-                    OK('extensions with more than %v character%s will not be affected\n',
-                       opt.limit+'', (opt.limit > 1)? 's': '');
+        'change to': {
+            spec: [ 'change', 'to', '$' ],
+            func: function (param) {
+                var r = param[0];
+                OK('file extensions will change to `%v\'\n', r);
+                opt.newext = r;
             }
-
-            return r[1];
+        },
+        'limit': {
+            spec: [ 'limit', '#' ],
+            func: function (param) {
+                var r = param[0];
+                if (r === 'off') {
+                    OK('every extension will be affected\n');
+                    opt.limit = -1
+                } else {
+                    opt.limit = +r;
+                    if (!_.isFinite(opt.limit) || opt.limit < 0) {
+                        ERR('invalid limit value\n');
+                        opt.limit = -1;
+                    } else
+                        OK('extensions with more than %v character%s will not be affected\n',
+                           opt.limit+'', (opt.limit > 1)? 's': '');
+                }
+            }
         }
     };
-
-    COMPLETER.add(_.keys(cmdset).alphanumSort());
 
     return {
         help:       help,

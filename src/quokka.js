@@ -4,7 +4,6 @@
 
 var assert = require('assert');
 var readline = require('readline');
-var util = require('util');
 var path = require('path');
 var fs = require('fs');
 
@@ -14,12 +13,15 @@ var argv = require('../node_modules/optimist')
                .boolean('n')
                .argv;
 var string = require('../node_modules/string');
-var wcwidth = require('../node_modules/wcwidth.js')();
 
 var alphanum = require('./lib/alphanum.js');
 var global = require('./lib/global');
 var mycolors = require('./lib/mycolors');
 var validator = require('./lib/validator')();
+var chain = require('./lib/chain');
+var context = require('./lib/context');
+var parser = require('./lib/parser');
+var command = require('./lib/command');
 
 // rules
 var extension = require('./extension');
@@ -31,348 +33,7 @@ var serialize = require('./serialize');
 var strip = require('./strip');
 var letterCase = require('./case');
 
-var parseQStr = global.parseQStr;
 var VERSION = '0.0.4';
-
-
-// fills a path object
-// p = { dir: 'dir name', file: 'base name' }, ... ]
-var fillPath = function (p) {
-    var dir, file;
-
-    assert(p);
-    assert(_.isString(p.dir));
-    assert(_.isString(p.file));
-
-    var _esc = function (s) {
-        var i, w,
-            n = 0, t = '';
-
-        assert(_.isString(s));
-
-        for (i = 0; i < s.length; i++) {
-            w = wcwidth(s.charAt(i));
-            t += ((w <= 0)? (w = 1, '?'): s.charAt(i));
-            n += w;
-        }
-
-        return {
-            str:   t,
-            width: n
-        };
-    };
-
-    p.full = p.dir + path.sep + p.file;
-    dir = _esc(p.dir);
-    file = _esc(p.file);
-    p.print = new String(dir.str + path.sep + file.str.file);
-    p.print.width = dir.width + 1 + file.width;
-
-    return p;
-}
-
-
-// manages rule chain
-// init = [ { dir: 'dir name', file: 'base name' }, ... ]
-var chain = function (init) {
-    var ch,
-        rule = {}, cache;
-
-    // registers or finds a rule
-    // entry = [ { name: 'rule name', desc: 'description', constructor: function () {} }, ... ] or
-    //         'rule name to find'
-    var rule = function (entry) {
-        var i;
-
-        assert(entry);
-
-        if (_.isString(entry)) {    // finds a rule by name
-            assert(_.isFunction(rule[entry]));
-            return rule[entry];
-        }
-
-        // registers a rule
-        if (!_.isArray(entry))
-            entry = [ entry ];
-
-        for (i = 0; i < entry.length; i++) {
-            if (rule[entry[i].name])    // already registered
-                break;
-            rule[entry[i].name] = entry[i].constructor;
-            cache = null;    // invalidates cache for names
-        }
-
-        return this;
-    };
-
-    // gets names/descriptions of registered rules
-    var ruleInfo = function () {
-        if (cache)
-            return cache;
-
-        cache = rule.foreach(function (name, memo) {
-            memo.push({
-                name: name,
-                desc: rule[name].desc
-            });
-            return memo;
-        }, []);
-
-        return cache;
-    };
-
-    // gets the final result of applied rules
-    var final = function () {
-        assert(ch.length >= 1);
-
-        return ch[ch.length-1].result;
-    };
-
-    var _rerun = function (idx) {
-        var i;
-
-        assert(_.isFinite(+idx));
-        assert(0 < +idx && +idx < ch.length);
-
-        for (i = +idx; i < ch.length; i++)
-            ch[i].result = ch[i].rule.instance.affect(ch[i-1].result)
-                               .process(function (e) {
-                                   return fillPath(e);
-                               });
-
-        return this;
-    };
-
-    // applies a rule by adding to rule chain
-    // rule = { name: 'rule name', instance: rule object }
-    var append = function (rule) {
-        assert(rule);
-        assert(rule.instance);
-        assert(_.isFunction(rule.instance.affect));
-
-        var prev = final();
-
-        ch.push({
-            rule: rule,
-        });
-        _rerun(ch.length-1);
-
-        return this;
-    };
-
-    // moves a rule
-    var move = function (from, to) {
-        var move;
-
-        assert(_.isFinite(+from));
-        assert(_.isFinite(+to));
-        assert(0 < +from && +from < ch.length);
-        assert(0 < +to && +to < ch.length);
-
-        move = ch[+from];
-        ch.splice(+from, 1);
-        ch.splice(+to, 0, move);
-
-        return this;
-    };
-
-    // drops a rule from rule chain
-    var drop = function (idx) {
-        assert(_.isFinite(+idx));
-        assert(+idx < ch.length);
-
-        ch.splice(+idx, 1);
-        if (+idx >= ch.length)
-            idx = ch.length-1;
-        if (+idx > 0)
-            _rerun(idx);
-
-        return this;
-    };
-
-    // applies a rule without adding to rule chain
-    // rule = { instance: rule object }
-    var peek = function (rule) {
-        assert(rule);
-        assert(rule.instance);
-        assert(_.isFunction(rule.instance.affect));
-
-        assert(ch.length > 0);
-
-        return rule.instance.affect(final()).process(function (e) {
-            return fillPath(e);
-        });
-    };
-
-    // gets or sets the initial data
-    var initial = function (data) {
-        if (data) {    // sets
-            init = data;
-            init.process(function (e) {
-                return fillPath(e);
-            });
-
-            ch = [];
-            ch[0] = {
-                rule:   {
-                    name:     '',
-                    instance: null
-                },
-                result: init
-            };
-            return this;
-        } else {    // gets
-            assert(_.isArray(init));
-            return init;
-        }
-    };
-
-    // gets the rule list
-    var ruleList = function () {
-        var i, r = [];
-
-        assert(ch.length > 0);
-        for (i = 1; i < ch.length; i++)
-            r.push({
-                name:   ch[i].rule.name,
-                option: ch[i].rule.instance.option()
-            });
-
-        return r;
-    };
-
-    // gets the length of rule chain
-    var ruleLength = function () {
-        assert(ch.length > 0);
-        return ch.length;
-    };
-
-    initial(init);
-
-    return {
-        rule:       rule,
-        ruleInfo:   ruleInfo,
-        initial:    initial,
-        final:      final,
-        append:     append,
-        drop:       drop,
-        move:       move,
-        peek:       peek,
-        ruleList:   ruleList,
-        ruleLength: ruleLength,
-    };
-};
-
-
-// manages context
-var context = function () {
-    var _empty = function () {    // for initial context
-        var help = function () {};
-        var commandSet = function () { return {}; }
-        var affect = function (x) { return x; }
-        var option = function () { return ''; }
-
-        return {
-            help:       help,
-            commandSet: commandSet,
-            affect:     affect,
-            option:     option
-        };
-    };
-
-    var emptyCtx = {
-        name:     '',
-        instance: _empty()
-    };
-
-    var cur = emptyCtx;
-
-    // sets or unsets current context
-    // ch = chain object
-    // name = 'rule name'
-    var set = function (ch, name) {
-        if (!ch && !name) {    // unsets
-            if (cur === emptyCtx)
-                return false;
-            cur = emptyCtx;
-            return true;
-        } else {    // sets
-            assert(ch);
-            assert(_.isString(name) && name);
-
-            cur = {
-                name:     name,
-                instance: ch.rule(name)()
-            };
-            assert(cur.instance);
-        }
-
-        return this;
-    };
-
-    // checks if current context set
-    var isSet = function () {
-        return (cur !== emptyCtx);
-    };
-
-    // gets current context
-    var current = function () {
-        assert(cur);
-
-        return cur;
-    };
-
-    // gets name of current context
-    var name = function () {
-        assert(_.isString(cur.name));
-
-        return cur.name;
-    };
-
-    // prints help message of current context
-    var help = function () {
-        assert(_.isFunction(cur.instance.help));
-
-        cur.instance.help();
-
-        return this;
-    };
-
-    // gets command set of current context
-    var commandSet = function () {
-        assert(_.isFunction(cur.instance.commandSet));
-
-        return cur.instance.commandSet();
-    };
-
-    return {
-        set:        set,
-        isSet:      isSet,
-        current:    current,
-        name:       name,
-        help:       help,
-        commandSet: commandSet
-    };
-};
-
-
-// run commands
-var runCommand = function (cmdset, input) {
-    var cmds = _.keys(cmdset);
-
-    assert(_.isString(input));
-    assert(input === input.trim());
-
-    for (i = 0; i < cmds.length; i++) {
-        regex = new RegExp('^' + cmds[i]+'\\b');
-        if (regex.test(input)) {
-            input = cmdset[cmds[i]](input.substring(cmds[i].length)).trim();
-            break;
-        }
-    }
-
-    return (i === cmds.length)? null: input;
-};
 
 
 // terminates program
@@ -409,7 +70,7 @@ var nameList = function (list) {
 
     for (var i = 0; i < list.length; i++) {
         list[i] = path.normalize(list[i]);
-        if (list[i].charAt(list[i].length-1) === '/')
+        if (list[i].charAt(list[i].length-1) === path.sep)
             list[i] = list[i].substring(0, list[i].length-1);
         dir = path.dirname(list[i]);
         file = path.basename(list[i]);
@@ -490,57 +151,6 @@ var handleArgv = function () {
 };
 
 
-// mamages completer
-var completer = function (init) {
-    var completion = [];
-
-    assert(!init || _.isArray(init));
-
-    // adds entry to completion list
-    // entry = [ 'entry', ... ] or 'entry'
-    var add = function (entry) {
-        if (_.isArray(entry))
-            completion = completion.concat(
-                entry.slice().process(function (e) {
-                    return e + ' ';
-                }));
-        else {
-            assert(_.isString(entry) && entry);
-            completion.push(entry + ' ');
-        }
-
-        return this;
-    };
-
-    // resets completion list to initial
-    var reset = function () {
-        completion = init;
-
-        return this;
-    };
-
-    // completer function for readline
-    // line = 'user input'
-    var completer = function (line) {
-        var hit = completion.filter(function (c) {
-            return c.indexOf(line) === 0
-        });
-        return [(hit.length > 0)? hit: completion, line];
-    };
-
-    init = init.slice().process(function (e) {
-        return e + ' ';
-    });
-    reset();
-
-    return {
-        add:       add,
-        reset:     reset,
-        completer: completer
-    };
-};
-
-
 // exposes variables as global to share with rules
 // those variables will be written in UPPERCASE
 var setGlobal = function (vars) {
@@ -554,14 +164,14 @@ var setGlobal = function (vars) {
 
 // quokka starts from here
 (function () {
-    var mc;
-    var ch;
+    var mc, ch, cset, p;
     var ctx = context();
     var defPrompt = '> ',
         prompt = defPrompt;
-    var files, input, rules, info, names;
+    var files, rules, info, names;
     var newset = [];
-    var prepRule = function (r) {
+
+    var prepRuleForChain = function (r) {
         assert(_.isArray(r));
 
         return r.foreach(function (idx, memo) {
@@ -572,6 +182,47 @@ var setGlobal = function (vars) {
             });
             return memo;
         }, []);
+    };
+
+    var prepRuleForCset = function (r) {
+        var e = {};
+
+        assert(_.isArray(r));
+
+        return r.foreach(function (idx) {
+            var name = '#' + r[idx].id;
+            e[name] = {
+                spec: [ name ],
+                func: function () {
+                    if (name === ctx.name())
+                        ERR('you are already in `%r\'\n', names[i].rule);
+                    else if (ctx.isSet())
+                        ERR('you need to cancel the rule being edited first\n');
+                    else {
+                        OK('entering `%r\'\n', name);
+                        prompt = name + '> ';
+                        ctx.set(ch, name);
+                        cset.add({
+                            name: name,
+                            set:  ctx.commandSet()
+                        }).remove('rules');
+                        p.cmdset(cset.get());
+                    }
+                },
+                dryrun: function (lastr) {
+                    if (!lastr) {
+                        cset.add({
+                            name: name,
+                            set:  ch.rule(name)().commandSet()
+                        }).remove('rules');
+                        return name;
+                    }
+                    return lastr;
+                }
+            };
+
+            return e;
+        });
     };
 
     string.extendPrototype();
@@ -600,7 +251,7 @@ var setGlobal = function (vars) {
     assert(_.isArray(files));
 
     ch = chain(files);
-    ch.rule(prepRule([
+    ch.rule(prepRuleForChain(rules = [
         extension,
         insert,
         del,
@@ -613,7 +264,6 @@ var setGlobal = function (vars) {
     info = ch.ruleInfo().sort(function (a, b) {
         return a.name > b.name;
     });
-    names = info.collect('name');
 
     var help = function () {
         var n;
@@ -768,214 +418,327 @@ var setGlobal = function (vars) {
         OUT('');
     };
 
-    var cmdset = {
-        'help': function (input) {
-            help();
-            if (ctx.isSet())
-                ctx.help();
-            return input;
-        },
-        'quit': function (input) {
-            rl.close();
-            return input;
-        },
-        'exit': function (input) {
-            return cmdset['quit'](input);
-        },
-        'version': function (input) {
-            version();
-            return input;
-        },
-        'cancel': function (input) {
-            var name;
-            if (!_.isUndefined(input)) {
-                if (!ctx.isSet())
-                    WARN('no rule being edited\n');
-                else {
-                    name = ctx.name();
-                    ctx.set();
-                    OK('exiting from `%r\'\n', name);
+    cset = command({
+        name: 'global',
+        set: {
+            'help': {
+                spec: [ 'help' ],
+                func: function () {
+                    help();
+                    if (ctx.isSet())
+                        ctx.help();
                 }
-            }
-            prompt = defPrompt;
-            COMPLETER.reset();
-            return input;
-        },
-        'done': function (input) {
-            if (!_.isUndefined(input)) {
-                if (!ctx.isSet())
-                    WARN('no rule being edited\n');
-                else {
-                    ch.append(ctx.current());
-                    ctx.set();
+            },
+            'quit': {
+                spec: [ 'quit' ],
+                func: function () {
+                    rl.close();
                 }
-            }
-            OK('files will be renamed as follows when you type `%c\'', 'rename');
-            OUT('-------------------------------------------------------');
-            fromTo(ch.initial(), ch.final());
-            cmdset['cancel']();
-            return input;
-        },
-        'describe': function (input) {
-            if (!ctx.isSet())
-                WARN('no rule being edited; use `%c\' to see the rule chain\n', 'rules');
-            else {
-                OK('current rule being edited');
-                OUT('-------------------------');
-                OUT(ctx.current().instance.option() + '\n');
-            }
-            return input;
-        },
-        'preview': function (input) {
-            if (ctx.isSet()) {
-                cmdset['describe']();
-                OK('files will be renamed as follows when you type `%c\' and `%c\'',
-                   'done', 'rename');
-                OUT('------------------------------------------------------------------');
-                fromTo(ch.initial(), ch.peek(ctx.current()));
-            } else
-                cmdset['done']();
-            return input;
-        },
-        'rules': function (input) {
-            rules = ch.ruleList();
-            OUT('rules are applied as follows\n'.ok +
-                '----------------------------');
-            if (rules.length === 0)
-                WARN('no rule in rule chain\n');
-            else
-                ruleList(rules);
-            return input;
-        },
-        'move': function (input) {
-            var f = parseQStr(input), t = parseQStr(f[1]), fidx, tidx;
-            fidx = f[0].toInt();
-            tidx = t[0].toInt();
-            if (!_.isFinite(fidx) || !_.isFinite(tidx) || fidx < 1 || fidx >= ch.ruleLength() ||
-                tidx < 1 || tidx >= ch.ruleLength()) {
-                ERR('invalid rule index\n');
-            } else {
-                ch.move(fidx, tidx);
-                cmdset['rules']();
-            }
-            return t[1];
-        },
-        'drop': function (input) {
-            var r = parseQStr(input), idx;
-            idx = r[0].toInt();
-            if (!_.isFinite(idx) || idx < 1 || idx >= ch.ruleLength()) {
-                ERR('invalid rule index\n');
-            } else {
-                ch.drop(idx);
-                cmdset['rules']();
-            }
-            return r[1];
-        },
-        'rename': function (input) {
-            var num = 0;
-
-            if (newset.length > 0)
-                return input;
-            if (ctx.isSet())
-                WARN('you need to `%c\' or `%c\' the rule being edited\n', 'done', 'cancel');
-            else {
-                OK('files are being renamed');
-                OUT('----------------------');
-                fromTo(ch.initial(), ch.final(),
-                    function (p, pmax, n, nmax, inv, cflt) {
-                        var fail;
-
-                        if (inv && inv.name === 'refrained')
-                            inv = null;
-                        if (!inv && !cflt && p.full !== n.full) {
-                            try {
-                                fs.renameSync(p.full, n.full);
-                            } catch(e) {
-                                fail = e.message;
-                                newset.push(p.full);
-                            }
-                        } else
-                            newset.push(p.full);
-                        OUT('%s | %s%s', pad(p.print, pmax), pad(n.print, nmax),
-                            (inv || cflt)? ' [' + 'skipped'.warn + ']':
-                            (!fail)? ' [' + 'ok'.ok + ']': '');
-
-                        if (fail)
-                            ERR('%s', fail);
-                        else if (!inv && !cflt) {
-                            num++;
-                            newset.push(n.full);
+            },
+            'exit': {
+                spec: [ 'exit' ],
+                func: function () {
+                    rl.close();
+                }
+            },
+            'version': {
+                spec: [ 'version' ],
+                func: function () {
+                    version();
+                }
+            },
+            'cancel': {
+                spec: [ 'cancel' ],
+                func: function () {
+                    var name;
+                    if (!ctx.isSet())
+                        WARN('no rule being edited\n');
+                    else {
+                        name = ctx.name();
+                        cset.remove(name).add(rules);
+                        ctx.set();
+                        OK('exiting from `%r\'\n', name);
+                    }
+                    prompt = defPrompt;
+                },
+                dryrun: function (lastr) {
+                    if (lastr)
+                        cset.remove(lastr).add(rules);
+                    return null;
+                }
+            },
+            'done': {
+                spec: [ 'done' ],
+                func: function (param) {
+                    if (!param || param.length === 0) {
+                        if (!ctx.isSet())
+                            WARN('no rule being edited\n');
+                        else {
+                            ch.append(ctx.current());
+                            cset.remove(ctx.name()).add(rules);
+                            ctx.set();
                         }
-                    });
-                if (num > 0)
-                    OK('%s files successfully renamed', num+'');
-                newset = nameList(newset);
-            }
-            return input;
-        },
-        'reset': function (input) {
-            if (newset.length > 0) {
-                ch.initial(newset);
-                OK('file list and rules have been reset\n');
-                newset = [];
-            } else
-                ERR('nothing to reset; `rename\' first\n');
-            return input;
-        }
-    };
+                    }
+                    OK('files will be renamed as follows when you type `%c\'', 'rename');
+                    OUT('-------------------------------------------------------');
+                    fromTo(ch.initial(), ch.final());
+                    prompt = defPrompt;
+                },
+                dryrun: function (lastr) {
+                    if (lastr)
+                        cset.remove(lastr).add(rules);
+                    return null;
+                }
+            },
+            'describe': {
+                spec: [ 'describe' ],
+                func: function () {
+                    if (!ctx.isSet())
+                        WARN('no rule being edited; use `%c\' to see the rule chain\n', 'rules');
+                    else {
+                        OK('current rule being edited');
+                        OUT('-------------------------');
+                        OUT(ctx.current().instance.option() + '\n');
+                    }
+                 }
+             },
+            'preview': {
+                spec: [ 'preview' ],
+                func: function () {
+                    if (ctx.isSet()) {
+                        cset.cmd('describe').func();
+                        OK('files will be renamed as follows when you type `%c\' and `%c\'',
+                           'done', 'rename');
+                        OUT('------------------------------------------------------------------');
+                        fromTo(ch.initial(), ch.peek(ctx.current()));
+                    } else
+                        cset.cmd('done').func();
+                }
+            },
+            'rules': {
+                spec: [ 'rules' ],
+                func: function () {
+                    var r = ch.ruleList();
+                    OUT('rules are applied as follows\n'.ok +
+                        '----------------------------');
+                    if (r.length === 0)
+                        WARN('no rule in rule chain\n');
+                    else
+                        ruleList(r);
+                }
+            },
+            'move': {
+                spec: [ 'move', '#', '#' ],
+                func: function (param) {
+                    var fidx, tidx;
+                    fidx = +param[0];
+                    tidx = +param[1];
+                    if (!_.isFinite(fidx) || !_.isFinite(tidx) || fidx < 1 || fidx >= ch.ruleLength() ||
+                        tidx < 1 || tidx >= ch.ruleLength()) {
+                        ERR('invalid rule index\n');
+                    } else {
+                        ch.move(fidx, tidx);
+                        cset.cmd('rules').func();
+                    }
+                }
+            },
+            'drop': {
+                spec: [ 'drop', '#' ],
+                func: function (param) {
+                    var idx = +param[0];
+                    if (!_.isFinite(idx) || idx < 1 || idx >= ch.ruleLength()) {
+                        ERR('invalid rule index\n');
+                    } else {
+                        ch.drop(idx);
+                        cset.cmd('rules').func();
+                    }
+                }
+            },
+            'rename': {
+                spec: [ 'rename' ],
+                func: function () {
+                    var num = 0;
 
-    setGlobal({
-        COMPLETER: completer(_.keys(cmdset).concat(names).alphanumSort())
+                    if (newset.length > 0)
+                        return;
+                    if (ctx.isSet())
+                        WARN('you need to `%c\' or `%c\' the rule being edited\n',
+                             'done', 'cancel');
+                    else {
+                        OK('files are being renamed');
+                        OUT('----------------------');
+                        fromTo(ch.initial(), ch.final(),
+                            function (p, pmax, n, nmax, inv, cflt) {
+                                var fail;
+
+                                if (inv && inv.name === 'refrained')
+                                    inv = null;
+                                if (!inv && !cflt && p.full !== n.full) {
+                                    try {
+                                        fs.renameSync(p.full, n.full);
+                                    } catch(e) {
+                                        fail = e.message;
+                                       newset.push(p.full);
+                                    }
+                                } else
+                                    newset.push(p.full);
+                                OUT('%s | %s%s', pad(p.print, pmax), pad(n.print, nmax),
+                                    (inv || cflt)? ' [' + 'skipped'.warn + ']':
+                                    (!fail)? ' [' + 'ok'.ok + ']': '');
+
+                                if (fail)
+                                    ERR('%s', fail);
+                                else if (!inv && !cflt) {
+                                    num++;
+                                    newset.push(n.full);
+                                }
+                            });
+                        if (num > 0)
+                            OK('%s files successfully renamed', num+'');
+                        newset = nameList(newset);
+                    }
+                }
+            },
+            'reset': {
+                spec: [ 'reset' ],
+                func: function () {
+                    if (newset.length > 0) {
+                        ch.initial(newset);
+                        OK('file list and rules have been reset\n');
+                        newset = [];
+                    } else
+                        ERR('nothing to reset; `rename\' first\n');
+                }
+            }
+        }
+    }).add(rules = {
+        name: 'rules',
+        set:  prepRuleForCset(rules)
     });
 
-    rl = readline.createInterface(process.stdin, process.stdout, COMPLETER.completer);
+    // mamages readline completer
+    var completer = function () {
+        // completer function for readline
+        // line = 'user input'
+        return function (line) {
+            var hit = [], comp;
+            var p = parser(cset.get(), line);
+            var last = {
+                last: '',
+                expect: 'cmd'
+            };
+            var lastr = (ctx.isSet())? ctx.name(): null;
+            var t;
+
+            var esc = function (s) {
+                assert(_.isString(s));
+                if (/[\s\\]/.test(s))
+                    s = s.replace(/([\s\\])/g, '\\$1');
+                return s;
+            };
+
+            cset.push();
+            while ((t = p.token(true)).last !== null) {
+                last = t;
+                if (t.cmd) {
+                    t = cset.cmd(t.cmd);
+                    if (t && _.isFunction(t.dryrun)) {
+                        lastr = t.dryrun(lastr);
+                        p.cmdset(cset.get());
+                    }
+                }
+            }
+            if (last)
+                switch (last.expect) {
+                    case 'param':
+                        comp = ch.peek(ctx.current()).collect('file').process(function (f) {
+                            return esc(f);
+                        });
+                        (function () {
+                            var n, s, h = {};
+                            if (!last.last)
+                                return;
+                            for (var i = 0; i < comp.length; i++) {
+                                n = comp[i].indexOf(last.last);
+                                if (n >= 0 && !h[s=comp[i].substring(n)]) {
+                                    hit.push(s);
+                                    h[s] = true;
+                                }
+                            }
+                        })();
+                        break;
+                    case 'file':
+                        (function () {
+                            var d, f, stat;
+
+                            d = (last.last && path.dirname(last.last)) || '.'+path.sep;
+                            f = (last.last && path.basename(last.last)) || '';
+                            if (f[f.length-1] === path.sep) {
+                                d += path.sep + f;
+                                f = '';
+                            }
+                            try {
+                                comp = fs.readdirSync(d).alphanumSort();
+                                comp.process(function (file) {
+                                    try {
+                                        stat = fs.statSync(d+path.sep+file);
+                                        if (stat.isDirectory())
+                                            file += path.sep;
+                                    } catch(e) {
+                                    }
+                                    return esc(file);
+                                });
+                                if (f) {
+                                    hit = comp.filter(function (c) {
+                                        return (c.indexOf(f) === 0);
+                                    });
+                                    last.last = f;
+                                }
+                            } catch(e) {
+                                comp = [];
+                            }
+                        })();
+                        break;
+                    default:
+                        comp = _.keys(cset.get()).process(function (cmd) {
+                            return cmd + ' ';
+                        }).sort();
+                        if (last.last)
+                            hit = comp.filter(function (c) {
+                                return (c.indexOf(last.last) === 0);
+                            });
+                        else
+                            last.last = '';
+                        break;
+                }
+            cset.pop();
+
+            return [((hit.length > 0)? hit: comp), last.last];
+        };
+    };
+
+    rl = readline.createInterface(process.stdin, process.stdout, completer());
     rl.setPrompt(prompt);
     rl.prompt();
 
+    p = parser(cset.get());
+
     rl.on('line', function(line) {
-        var i, ret;
+        var t;
 
-        input = line.trim();
-        while (input) {
-            assert(_.isString(input));
-            assert(input === input.trim());
-
-            // commands
-            do {
-                ret = runCommand(_.extend({}, cmdset, ctx.commandSet()), input);
-                if (ret !== null)
-                    input = ret;
-            } while(ret && input);
-
-            // rule names
-            for (i = 0; i < names.length; i++) {
-                regex = new RegExp('^' + names[i] + '\\b');
-                if (regex.test(input)) {
-                    if (names[i] === ctx.name())
-                        ERR('you are already in `%r\'\n', names[i].rule);
-                    else if (ctx.isSet())
-                        ERR('you need to cancel the rule being edited first\n');
-                    else {
-                        OK('entering `%r\'\n', names[i]);
-                        prompt = names[i] + '> ';
-                        ctx.set(ch, names[i]);
-                    }
-                    input = input.substring(names[i].length).trim();
-                    break;
-                }
-            }
-
-            if (ret === null && i === names.length) {
-                ERR('invalid command `%c\'\n', input);
-                break;
-            }
+        p.start(line);
+        while ((t = p.token()).cmd) {
+            cset.cmd(t.cmd).func(t.param);
             if (newset.length > 0)
-                WARN('you need to `reset\' file list and rules after `rename\'\n');
+                WARN('you need to `%c\' file list and rules after `%c\'\n', 'reset', 'rename');
         }
+        if (t.last && t.expect === 'cmd' && !cset.cmd(t.last))
+            ERR('invalid command `%c\'\n', t.last.trim());
+        else if (t.last !== null)
+            ERR('missing arguments\n');
         rl.setPrompt(prompt);
         rl.prompt();
     }).on('close', function () {
-        OUT('');
         exit();
     });
 })();

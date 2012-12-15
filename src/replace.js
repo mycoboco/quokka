@@ -5,11 +5,8 @@
 var assert = require('assert');
 
 var _ = require('../node_modules/underscore');
-var string = require('../node_modules/string');
 
 var global = require('./lib/global');
-
-var parseQStr = global.parseQStr;
 
 
 // rule for replace
@@ -127,60 +124,64 @@ module.exports = function () {
     };
 
     cmdset = {
-        'replace': function (input) {
-            var r1 = parseQStr(input),
-                r2 = parseQStr(r1[1]);
-            opt.find = r1[0];
-            opt.replace = r2[0];
-            OK('`%v\' will be replaced with `%v\'\n', opt.find, opt.replace);
-
-            return r2[1];
+        'replace': {
+            spec: [ 'replace', '$', '$' ],
+            func: function (param) {
+                opt.find = param[0];
+                opt.replace = param[1];
+                OK('`%v\' will be replaced with `%v\'\n', opt.find, opt.replace);
+            }
         },
-        'all': function (input) {
-            opt.occur = 'all';
-            OK('%v occurrences will be replaced\n', 'all');
-
-            return input;
+        'all': {
+            spec: [ 'all' ],
+            func: function () {
+                opt.occur = 'all';
+                OK('%v occurrences will be replaced\n', 'all');
+            }
         },
-        'first': function (input) {
-            opt.occur = 'first';
-            OK('only the %v occurrence will be replaced\n', 'first');
-
-            return input;
+        'first': {
+            spec: [ 'first' ],
+            func: function () {
+                opt.occur = 'first';
+                OK('only the %v occurrence will be replaced\n', 'first');
+            }
         },
-        'last': function (input) {
-            opt.occur = 'last';
-            OK('only the %v occurrence will be replaced\n', 'last');
-
-            return input;
+        'last': {
+            spec: [ 'last' ],
+            func: function () {
+                opt.occur = 'last';
+                OK('only the %v occurrence will be replaced\n', 'last');
+            }
         },
-        'skip extension': function (input) {
-            opt.skipext = true;
-            OK('extensions will be %v while replacing\n', 'ignored');
-
-            return input;
+        'skip extension': {
+            spec: [ 'skip', 'extension' ],
+            func: function () {
+                opt.skipext = true;
+                OK('extensions will be %v while replacing\n', 'ignored');
+            }
         },
-        'include extension': function (input) {
-            opt.skipext = false;
-            OK('extensions will be %v while replacing\n', 'included');
-
-            return input;
+        'include extension': {
+            spec: [ 'include', 'extension' ],
+            func: function () {
+                opt.skipext = false;
+                OK('extensions will be %v while replacing\n', 'included');
+            }
         },
-        'case sesitive': function (input) {
-            opt.casesense = true;
-            OK('case %v\n', 'sensitive');
-
-            return input;
+        'case sensitive': {
+            spec: [ 'case', 'sensitive' ],
+            func: function () {
+                opt.casesense = true;
+                OK('case %v\n', 'sensitive');
+            }
         },
-        'case insesitive': function (input) {
-            opt.casesense = false;
-            OK('case %v\n', 'insensitive');
-
-            return input;
+        'case insesitive': {
+            spec: [ 'case', 'sensitive' ],
+            func: function () {
+                opt.casesense = false;
+                OK('case %v\n', 'insensitive');
+            }
         },
     };
-
-    COMPLETER.add(_.keys(cmdset).alphanumSort());
 
     return {
         help:       help,

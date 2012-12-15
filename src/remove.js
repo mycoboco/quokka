@@ -5,11 +5,8 @@
 var assert = require('assert');
 
 var _ = require('../node_modules/underscore');
-var string = require('../node_modules/string');
 
 var global = require('./lib/global');
-
-var parseQStr = global.parseQStr;
 
 
 // rule for remove
@@ -124,58 +121,63 @@ module.exports = function () {
     };
 
     cmdset = {
-        'remove': function (input) {
-            var r = parseQStr(input);
-            opt.text = r[0];
-            OK('`%v\' will be removed\n', opt.text);
-
-            return r[1];
+        'remove': {
+            spec: [ 'remove', '$' ],
+            func: function (param) {
+                opt.text = param[0];
+                OK('`%v\' will be removed\n', opt.text);
+            }
         },
-        'all': function (input) {
-            opt.occur = 'all';
-            OK('%v occurrences will be removed\n', 'all');
-
-            return input;
+        'all': {
+            spec: [ 'all' ],
+            func: function () {
+                opt.occur = 'all';
+                OK('%v occurrences will be removed\n', 'all');
+            }
         },
-        'first': function (input) {
-            opt.occur = 'first';
-            OK('only the %v occurrence will be removed\n', 'first');
-
-            return input;
+        'first': {
+            spec: [ 'first' ],
+            func: function () {
+                opt.occur = 'first';
+                OK('only the %v occurrence will be removed\n', 'first');
+            }
         },
-        'last': function (input) {
-            opt.occur = 'last';
-            OK('only the %v occurrence will be removed\n', 'last');
-
-            return input;
+        'last': {
+            spec: [ 'last' ],
+            func: function () {
+                opt.occur = 'last';
+                OK('only the %v occurrence will be removed\n', 'last');
+            }
         },
-        'skip extension': function (input) {
-            opt.skipext = true;
-            OK('extensions will be %v while removing\n', 'ignored');
-
-            return input;
+        'skip extension': {
+            spec: [ 'skip', 'extension' ],
+            func: function () {
+                opt.skipext = true;
+                OK('extensions will be %v while removing\n', 'ignored');
+            }
         },
-        'include extension': function (input) {
-            opt.skipext = false;
-            OK('extensions will be %v while removing\n', 'included');
-
-            return input;
+        'include extension': {
+            spec: [ 'include', 'extension' ],
+            func: function () {
+                opt.skipext = false;
+                OK('extensions will be %v while removing\n', 'included');
+            }
         },
-        'case sesitive': function (input) {
-            opt.casesense = true;
-            OK('case %v\n', 'sensitive');
-
-            return input;
+        'case sensitive': {
+            spec: [ 'case', 'sensitive' ],
+            func: function () {
+                opt.casesense = true;
+                OK('case %v\n', 'sensitive');
+            }
         },
-        'case insesitive': function (input) {
-            opt.casesense = false;
-            OK('case %v\n', 'insensitive');
-
-            return input;
+        'case insensitive': {
+            spec: [ 'case', 'insensitive' ],
+            func: function () {
+                opt.casesense = false;
+                OK('case %v\n', 'insensitive');
+            }
         },
     };
-
-    COMPLETER.add(_.keys(cmdset).alphanumSort());
 
     return {
         help:       help,

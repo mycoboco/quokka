@@ -5,11 +5,8 @@
 var assert = require('assert');
 
 var _ = require('../node_modules/underscore');
-var string = require('../node_modules/string');
 
 var global = require('./lib/global');
-
-var parseQStr = global.parseQStr;
 
 
 // rule for case
@@ -145,63 +142,70 @@ module.exports = function () {
     };
 
     cmdset = {
-        'keep original': function (input) {
-            opt.func = 'original';
-            OK('letter case will %v change\n', 'not');
-
-            return input;
+        'keep original': {
+            spec: [ 'keep', 'original' ],
+            func: function () {
+                opt.func = 'original';
+                OK('letter case will %v change\n', 'not');
+            }
         },
-        'titlecase': function (input) {
-            opt.func = 'title';
-            OK('file names will be %v case\n', 'title');
-
-            return input;
+        'titlecase': {
+            spec: [ 'titlecase' ],
+            func: function () {
+                opt.func = 'title';
+                OK('file names will be %v case\n', 'title');
+            }
         },
-        'lowercase': function (input) {
-            opt.func = 'lower';
-            OK('file names will be %v case\n', 'lower');
-
-            return input;
+        'lowercase': {
+            spec: [ 'lowercase' ],
+            func: function () {
+                opt.func = 'lower';
+                OK('file names will be %v case\n', 'lower');
+            }
         },
-        'uppercase': function (input) {
-            opt.func = 'upper';
-            OK('file names will be %v case\n', 'upper');
-
-            return input;
+        'uppercase': {
+            spec: [ 'uppercase' ],
+            func: function () {
+                opt.func = 'upper';
+                OK('file names will be %v case\n', 'upper');
+            }
         },
-        'invert': function (input) {
-            opt.func = 'invert';
-            OK('file names will have %v case\n', 'inverted');
-
-            return input;
+        'invert': {
+            spec: [ 'invert' ],
+            func: function () {
+                opt.func = 'invert';
+                OK('file names will have %v case\n', 'inverted');
+            }
         },
-        'capitalize': function (input) {
-            opt.func = 'capitalize';
-            OK('only %v character will be %v case\n', 'first', 'upper');
-
-            return input;
+        'capitalize': {
+            spec: [ 'capitalize' ],
+            func: function () {
+                opt.func = 'capitalize';
+                OK('only %v character will be %v case\n', 'first', 'upper');
+            }
         },
-        'lower extension': function (input) {
-            opt.skipext = 'lower';
-            OK('extensions will always be %v case\n', 'lower');
-
-            return input;
+        'lower extension': {
+            spec: [ 'lower', 'extension' ],
+            func: function () {
+                opt.skipext = 'lower';
+                OK('extensions will always be %v case\n', 'lower');
+            }
         },
-        'skip extension': function (input) {
-            opt.skipext = true;
-            OK('extensions will be %v while changing case\n', 'ignored');
-
-            return input;
+        'skip extension': {
+            spec: [ 'skip', 'extension' ],
+            func: function () {
+                opt.skipext = true;
+                OK('extensions will be %v while changing case\n', 'ignored');
+            }
         },
-        'include extension': function (input) {
-            opt.skipext = false;
-            OK('extensions will be %v while changing case\n', 'included');
-
-            return input;
+        'include extension': {
+            spec: [ 'include', 'extension' ],
+            func: function () {
+                opt.skipext = false;
+                OK('extensions will be %v while changing case\n', 'included');
+            }
         },
     };
-
-    COMPLETER.add(_.keys(cmdset).alphanumSort());
 
     return {
         help:       help,
