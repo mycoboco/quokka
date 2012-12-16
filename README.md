@@ -22,6 +22,7 @@ It provides a set of rules:
 - to replace a text (`#replace`)
 - to serialize file names (`#serialize`) and
 - to strip a set of characters off (`#strip`)
+- to import lines of a file for insertion (`#import`)
 
 with options for fine control. You can combine these rules as you want by
 adding them into the rule chain. Editing each rule and the rule chain is
