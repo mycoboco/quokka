@@ -148,6 +148,7 @@ module.exports = function (init) {
         move = ch[+from];
         ch.splice(+from, 1);
         ch.splice(+to, 0, move);
+        _rerun(Math.min(+from, +to));
 
         return this;
     };

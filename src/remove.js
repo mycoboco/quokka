@@ -25,7 +25,7 @@ module.exports = function () {
         console.log(
             'Commands for `#remove\' are:\n'.ok +
             '  remove <TEXT>          '.cmd + 'remove <TEXT>\n' +
-            '  all                    '.cmd + 'apply to all occurrences\n' +
+            '  all                    '.cmd + 'apply to all occurrences (default)\n' +
             '  first                  '.cmd + 'apply only to the first occurrence\n' +
             '  last                   '.cmd + 'apply only to the last occurrence\n' +
             '  skip extension         '.cmd + 'ignore extensions while removing (default)\n' +

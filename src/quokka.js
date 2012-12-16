@@ -32,8 +32,9 @@ var replace = require('./replace');
 var serialize = require('./serialize');
 var strip = require('./strip');
 var letterCase = require('./case');
+var im = require('./import');
 
-var VERSION = '0.0.4';
+var VERSION = '0.0.5';
 
 
 // terminates program
@@ -259,7 +260,8 @@ var setGlobal = function (vars) {
         replace,
         serialize,
         strip,
-        letterCase
+        letterCase,
+        im
     ]));
     info = ch.ruleInfo().sort(function (a, b) {
         return a.name > b.name;

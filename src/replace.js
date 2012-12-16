@@ -26,7 +26,7 @@ module.exports = function () {
         console.log(
             'Commands for `#replace\' are:\n'.ok +
             '  replace <FIND> <TEXT>      '.cmd + 'replace <FIND> with <TEXT>\n' +
-            '  all                        '.cmd + 'apply to all occurrences\n' +
+            '  all                        '.cmd + 'apply to all occurrences (default)\n' +
             '  first                      '.cmd + 'apply only to the first occurrence\n' +
             '  last                       '.cmd + 'apply only to the last occurrence\n' +
             '  skip extension             '.cmd + 'ignore extensions while replacing (default)\n' +

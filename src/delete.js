@@ -27,11 +27,12 @@ module.exports = function () {
             'Commands for `#delete\' are:\n'.ok +
             '  from position <N>           '.cmd + 'delete from the <N+1>-th character inclusive\n' +
             '  from delimiter <WORD>       '.cmd + 'delete from the first occurrence of <WORD>\n' +
-            '    skip delimiter            '.cmd + 'ignore the delimiter while deleting\n' +
+            '    skip delimiter            '.cmd + 'ignore the delimiter while deleting (default)\n' +
             '    include delimiter         '.cmd + 'include the delimiter while deleting\n' +
             '  until count <N>             '.cmd + 'delete <N> characters\n' +
             '  until delimiter <WORD>      '.cmd + 'delete until <WORD> encountered\n' +
-            '                                (also affected by ' + 'skip'.cmd + '/' + 'include delimiter'.cmd + ')\n' +
+            '                                (also affected by ' + 'skip'.cmd + '/' +
+                                             'include delimiter'.cmd + ')\n' +
             '  until end                   '.cmd + 'delete until the end\n' +
             '  skip extension              '.cmd + 'ignore extensions while deleting (default)\n' +
             '  include extension           '.cmd + 'delete extensions if should\n' +

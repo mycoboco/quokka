@@ -1,43 +1,46 @@
 /*
- *  serialize rule
+ *  import rule
  */
 
 var assert = require('assert');
+var fs = require('fs');
 
 var _ = require('../node_modules/underscore');
 
 var global = require('./lib/global');
 
 
-// rule for serialize
+// rule for import
 module.exports = function () {
     var cmdset;
-    var opt = {    // default: start 1, step 1, as suffix
-        start:   1,
-        step:    1,
+    var opt = {    // default: import
+        file:    '(no file)',
         func:    'suffix',
+        text:    [],
         skipext: true,
         keephid: true,
-        pad:     1
+        repeat:  1,
+        empty:   true
     };
 
     // prints help message
     var help = function () {
         //   12345678911234567892123456789312345678941234567895123456789612345678971234567898
         console.log(
-            'Commands for `#serialize\' are:\n'.ok +
-            '  start <N>                '.cmd + 'numbers will start with <N>\n' +
-            '  step <M>                 '.cmd + 'numbers will go with a step of <M>\n' +
+            'Commands for `#import\' are:\n'.ok +
+            '  import <FILE>            '.cmd + 'import <FILE> for text insertion\n' +
+            '    skip empty             '.cmd + 'ignore if lines are empty\n' +
+            '    include empty          '.cmd + 'insert even if lines are empty (default)\n' +
             '  after <WORD>             '.cmd + 'insert after every occurrence of <WORD>\n' +
             '    skip extension         '.cmd + 'append before extensions (default)\n' +
             '    include extension      '.cmd + 'append after extensions\n' +
             '  before <WORD>            '.cmd + 'insert before every occurrence of <WORD>\n' +
             '                             (also affected by ' + 'skip'.cmd + '/' +
                                           'include extension'.cmd + ')\n' +
-            '  as prefix                '.cmd + 'prepend\n' +
+            '  as prefix                '.cmd + 'prepend (default)\n' +
             '    keep hidden            '.cmd + 'preserve hidden property (default)\n' +
             '    ignore hidden          '.cmd + 'ignore hidden property\n' +
-            '  as suffix                '.cmd + 'append (default)\n' +
+            '  as suffix                '.cmd + 'append\n' +
             '                             (also affected by ' + 'skip'.cmd + '/' +
                                           'include extension'.cmd + ')\n' +
             '  at <N>                   '.cmd + 'insert after <N> characters\n' +
@@ -45,7 +48,7 @@ module.exports = function () {
                                           'include extension'.cmd + ')\n' +
             '    left to right          '.cmd + 'count from left to right (default)\n' +
             '    right to left          '.cmd + 'count from right to left\n' +
-            '  pad <L>                  '.cmd + 'pad numbers to be <L>-digit\n');
+            '  repeat <N>               '.cmd + 'repeat insertion of each line <N> times\n');
     };
 
     // gets command set
@@ -54,27 +57,41 @@ module.exports = function () {
         return cmdset;
     };
 
-    var _rule = function (name, n) {
-        var m;
+    var _rule = function (name, i) {
+        var text = opt.text[(i/opt.repeat).integer()] || '';
 
-        m = (n < 0)? '-' + (Math.abs(n)+'').padLeft(opt.pad-1, '0').s:
-                     (n+'').padLeft(opt.pad, '0').s;
-        return global.insert(name, m, opt);
+        return global.insert(name, text, opt);
+    };
+
+    var _readFile = function (file) {
+        var line;
+
+        try {
+            line  = fs.readFileSync(file, 'utf-8');
+        } catch(e) {
+            ERR('error occurred while reading import file\n');
+            return null;
+        }
+
+        return line.split('\n');
     };
 
     // applies the rule to file names
     // src = [ { dir: 'dir name', file: 'file name' }, ... ]
     var affect = function (src) {
-        var n;
         var dst = [];
 
         assert(_.isArray(src));
 
-        n = opt.start;
-        for (var i = 0; i < src.length; i++, n += opt.step)
+        if (!opt.empty)
+            for (var i = 0; i < opt.text.length; i++)
+                if (!opt.text[i])
+                    opt.text.splice(i, 1);
+
+        for (var i = 0; i < src.length; i++)
             dst.push({
                 dir:  src[i].dir,
-                file: _rule(src[i].file, n)
+                file: _rule(src[i].file, i)
             });
 
         return dst;
@@ -90,8 +107,7 @@ module.exports = function () {
             switch(opt.func) {
                 case 'prefix':
                     return 'as ' + 'prefix'.val +
-                           ((opt.keephid)? ' preserving'.val: ' ignoring'.val) +
-                           ' hidden property';
+                           ((opt.keephid)? ' keeping'.val + ' hidden files'.val: '');
                 case 'suffix':
                     return 'as ' + 'suffix'.val + extension();
                 case 'at':
@@ -108,61 +124,65 @@ module.exports = function () {
             }
         };
 
-        return 'numbers (start ' + (opt.start+'').val +
-               ', step ' + (opt.step+'').val +
-               ', padding ' + (opt.pad+'').val +
-               ') will be inserted ' + where();
+        var empty = function () {
+            return ((opt.empty)? 'with'.val: 'without'.val) + ' empty lines ';
+        };
+
+        return 'lines of `' + opt.file.val + '\' will be inserted ' + empty() + where();
     };
 
     cmdset = {
-        'start': {
-            spec: [ 'start', '#' ],
+        'import': {
+            spec: [ 'import', '*' ],
             func: function (param) {
-                if (!_.isFinite(+param[0])) {
-                    ERR('invalid starting number `%v\'\n', param[0]);
-                    param[0] = 1;
+                OUT('loading `%v\'...', param[0]);
+                if ((opt.text = _readFile(param[0])) !== null) {
+                    opt.file = param[0];
+                    OUT('done\n');
+                    OK('`%v\' will be imported:', param[0]);
+                    OK('--------------------' + '-'.repeat(param[0].length));
+                    for (var i = 0; i < opt.text.length; i++)
+                        OUT(opt.text[i].val);
                 }
-                opt.start = +param[0];
-                OK('numbers will start with %v\n', opt.start);
             }
         },
-        'step': {
-            spec: [ 'step', '#' ],
+        'skip empty': {
+            spec: [ 'skip', 'empty' ],
+            func: function () {
+                opt.empty = false;
+                OK('empty lines will be %v while insertion\n', 'ignored');
+            }
+        },
+        'include empty': {
+            spec: [ 'include', 'empty' ],
+            func: function () {
+                opt.empty = true;
+                OK('empty lines will be %v while insertion\n', 'preserved');
+            }
+        },
+        'repeat': {
+            spec: [ 'repeat', '#' ],
             func: function (param) {
-                if (!_.isFinite(+param[0])) {
-                    ERR('invalid step number `%v\'\n', param[0]);
+                if (!_.isFinite(+param[0]) || +param[0] < 0) {
+                    ERR('invalid repeat number `%v\'\n', param[0]);
                     param[0] = 1;
                 }
-                opt.step = +param[0];
-                OK('numbers will go with a step of %v\n', opt.step);
+                opt.repeat = +param[0];
+                OK('each line will be repeated %v time%s\n', +param[0], (param[0] > 1)? 's': '');
             }
         },
         'as prefix': {
             spec: [ 'as', 'prefix' ],
             func: function () {
                 opt.func = 'prefix';
-                OK('numbers will be ' + 'prepended\n'.val);
-            }
-        },
-        'keep hidden': {
-            spec: [ 'keep', 'hidden' ],
-            func: function () {
-                opt.keephid = true;
-                OK('hidden property will be ' + 'preserved\n'.val);
-            }
-        },
-        'ignore hidden': {
-            spec: [ 'ignore', 'hidden' ],
-            func: function () {
-                opt.keephid = false;
-                OK('hidden property will %v be preserved\n', 'not');
+                OK('text will be ' + 'prepended\n'.val);
             }
         },
         'as suffix': {
             spec: [ 'as', 'suffix' ],
             func: function () {
                 opt.func = 'suffix';
-                OK('numbers will be ' + 'appended\n'.val);
+                OK('text will be ' + 'appended\n'.val);
             }
         },
         'skip extension': {
@@ -171,7 +191,7 @@ module.exports = function () {
                 opt.skipext = true;
                 if (opt.func === 'prefix')
                     WARN('`%c\' is not meaningful with `%c\'', 'skip extension', 'as prefix');
-                OK('numbers will be appended ' + 'before extensions\n'.val);
+                OK('text will be appended ' + 'before extensions\n'.val);
             }
         },
         'include extension': {
@@ -179,9 +199,9 @@ module.exports = function () {
             func: function () {
                 opt.skipext = false;
                 if (opt.func === 'prefix')
-                    WARN('`%c\' is not meaningful with `%c\'',
-                         'including extension', 'as prefix');
-                OK('numbers will be appended ' + 'to extensions\n'.val);
+                    WARN('`%c\' is not meaningful with `%c\'', 'including extension',
+                         'as prefix');
+                OK('text will be appended ' + 'to extensions\n'.val);
             }
         },
         'at': {
@@ -193,7 +213,8 @@ module.exports = function () {
                 } else
                     opt.func = 'at';
                 opt.at = +param[0];
-                OK('numbers will be appended after %v characters\n', +param[0]);
+                OK('text will be appended after %v character%s\n', +param[0],
+                   (param[0] > 1)? 's': '');
             }
         },
         'right to left': {
@@ -206,7 +227,7 @@ module.exports = function () {
             }
         },
         'left to right': {
-            spec: [ 'left', 'to', 'right' ],
+            spec: [ 'left', 'to', 'left' ],
             func: function () {
                 if (opt.func !== 'at')
                     WARN('`%c\' is meaningful only with `%c\'', 'left to right', 'at');
@@ -219,7 +240,7 @@ module.exports = function () {
             func: function (param) {
                 opt.func = 'after';
                 opt.after = param[0];
-                OK('numbers will be inserted after every `%v\'\n', opt.after);
+                OK('text will be inserted after every `%v\'\n', opt.after);
             }
         },
         'before': {
@@ -227,20 +248,9 @@ module.exports = function () {
             func: function (param) {
                 opt.func = 'before';
                 opt.before = param[0];
-                OK('numbers will be inserted before every `%v\'\n', opt.before);
+                OK('text will be inserted before every `%v\'\n', opt.before);
             }
         },
-        'pad': {
-            spec: [ 'pad', '#' ],
-            func: function (param) {
-                if (!_.isFinite(+param[0]) || +param[0] < 0) {
-                    ERR('invalid padding length `%v\'\n', param[0]);
-                    param[0] = 1;
-                }
-                opt.pad = +param[0];
-                OK('numbers will be padded to be %v-digit\n', +param[0]);
-            }
-        }
     };
 
     return {
@@ -253,7 +263,7 @@ module.exports = function () {
 
 
 // name and description for rule
-module.exports.id = 'serialize';
-module.exports.desc = 'serialize file names';
+module.exports.id = 'import';
+module.exports.desc = 'import lines of text file for insertion';
 
-// end of serialize.js
+// end of insert.js

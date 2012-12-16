@@ -28,7 +28,7 @@ module.exports = function () {
             '  uppercase              '.cmd + 'make file names be upper case\n' +
             '  invert                 '.cmd + 'invert letter case in file names\n' +
             '  capitalize             '.cmd + 'make only the first character be upper case\n' +
-            '  skip extension         '.cmd + 'ignore extensions while changing letter case\n' +
+            '  skip extension         '.cmd + 'ignore extensions while changing letter case (default)\n' +
             '  include extension      '.cmd + 'include extensions while changing letter case\n' +
             '  lower extension        '.cmd + 'extensions will always be lower case\n');
     };

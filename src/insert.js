@@ -12,10 +12,11 @@ var global = require('./lib/global');
 // rule for insert
 module.exports = function () {
     var cmdset;
-    var opt = {    // default: insert nothing as prefix
+    var opt = {    // default: insert nothing as prefix keeping hidden files
         func:    'prefix',
         text:    '',
-        skipext: true
+        skipext: true,
+        keephid: true
     };
 
     // prints help message
@@ -25,14 +26,22 @@ module.exports = function () {
             'Commands for `#insert\' are:\n'.ok +
             '  insert <TEXT>            '.cmd + 'insert <TEXT> into designated position\n' +
             '  after <WORD>             '.cmd + 'insert after every occurrence of <WORD>\n' +
-            '  as prefix                '.cmd + 'prepend (default)\n' +
-            '  as suffix                '.cmd + 'append\n' +
             '    skip extension         '.cmd + 'append before extensions (default)\n' +
             '    include extension      '.cmd + 'append after extensions\n' +
+            '  before <WORD>            '.cmd + 'insert before every occurrence of <WORD>\n' +
+            '                             (also affected by ' + 'skip'.cmd + '/' +
+                                          'include extension'.cmd + ')\n' +
+            '  as prefix                '.cmd + 'prepend (default)\n' +
+            '    keep hidden            '.cmd + 'preserve hidden property (default)\n' +
+            '    ignore hidden          '.cmd + 'ignore hidden property\n' +
+            '  as suffix                '.cmd + 'append\n' +
+            '                             (also affected by ' + 'skip'.cmd + '/' +
+                                          'include extension'.cmd + ')\n' +
             '  at <N>                   '.cmd + 'insert after <N> characters\n' +
+            '                             (also affected by ' + 'skip'.cmd + '/' +
+                                          'include extension'.cmd + ')\n' +
             '    left to right          '.cmd + 'count from left to right (default)\n' +
-            '    right to left          '.cmd + 'count from right to left\n' +
-            '  before <WORD>            '.cmd + 'insert before every occurrence of <WORD>\n');
+            '    right to left          '.cmd + 'count from right to left\n');
     };
 
     // gets command set
@@ -64,20 +73,25 @@ module.exports = function () {
     // gets string to describe opts
     var option = function () {
         var where = function () {
+            var extension = function () {
+                return ((opt.skipext)? ' skipping'.val: ' including'.val) + ' extensions';
+            };
+
             switch(opt.func) {
                 case 'prefix':
                     return 'as ' + 'prefix'.val +
-                           ((opt.keephid)? ' keeping'.val + ' hidden files'.val: '');
+                           ((opt.keephid)? ' preserving'.val: ' ignoring'.val) +
+                           ' hidden property';
                 case 'suffix':
-                    return 'as ' + 'suffix'.val +
-                           ((opt.skipext)? ' skipping'.val: ' including'.val) + ' extensions';
+                    return 'as ' + 'suffix'.val + extension();
                 case 'at':
                     return 'at ' + (''+opt.at).val +
-                           ((opt.reverse)? ' counting ' + 'from right to left'.val: '');
+                           ((opt.reverse)? ' counting ' + 'from right to left'.val: '') +
+                           extension();
                 case 'after':
-                    return 'after `' + opt.after.val + '\'';
+                    return 'after `' + opt.after.val + '\'' + extension();
                 case 'before':
-                    return 'before `' + opt.before.val + '\'';
+                    return 'before `' + opt.before.val + '\'' + extension();
                 default:
                     assert(false);
                     break;
@@ -102,6 +116,20 @@ module.exports = function () {
                 OK('text will be ' + 'prepended\n'.val);
             }
         },
+        'keep hidden': {
+            spec: [ 'keep', 'hidden' ],
+            func: function () {
+                opt.keephid = true;
+                OK('hidden property will be ' + 'preserved\n'.val);
+            }
+        },
+        'ignore hidden': {
+            spec: [ 'ignore', 'hidden' ],
+            func: function () {
+                opt.keephid = false;
+                OK('hidden property will %v be preserved\n', 'not');
+            }
+        },
         'as suffix': {
             spec: [ 'as', 'suffix' ],
             func: function () {
@@ -113,8 +141,8 @@ module.exports = function () {
             spec: [ 'skip', 'extension' ],
             func: function () {
                 opt.skipext = true;
-                if (opt.func !== 'suffix')
-                    WARN('`%c\' is meaningful only with `%c\'', 'skip extension', 'as suffix');
+                if (opt.func === 'prefix')
+                    WARN('`%c\' is not meaningful with `%c\'', 'skip extension', 'as prefix');
                 OK('text will be appended ' + 'before extensions\n'.val);
             }
         },
@@ -122,16 +150,15 @@ module.exports = function () {
             spec: [ 'include', 'extension' ],
             func: function () {
                 opt.skipext = false;
-                if (opt.func !== 'suffix')
-                    WARN('`%c\' is meaningful only with `%c\'', 'including extension',
-                         'as suffix');
+                if (opt.func === 'prefix')
+                    WARN('`%c\' is not meaningful with `%c\'', 'including extension',
+                         'as prefix');
                 OK('text will be appended ' + 'to extensions\n'.val);
             }
         },
         'at': {
             spec: [ 'at', '#' ],
             func: function (param) {
-                var r = parseQStr(input);
                 if (!_.isFinite(+param[0]) || +param[0] < 0) {
                     ERR('invalid location `%v\'\n', param[0]);
                     param[0] = 0;

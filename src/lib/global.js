@@ -140,7 +140,7 @@ global.insert = function (name, text, opt) {
             assert(_.isString(name));
             assert(_.isFinite(opt.at));
 
-            r = global.extension(name);
+            r = (opt.skipext)? global.extension(name): [ name, '' ];
             at = (opt.reverse)? r[0].length - opt.at: opt.at;
             return r[0].substring(0, at) + text + r[0].substring(at) + r[1];
         },
@@ -148,14 +148,14 @@ global.insert = function (name, text, opt) {
             assert(_.isString(name));
             assert(_.isString(opt.after));
 
-            r = global.extension(name);
+            r = (opt.skipext)? global.extension(name): [ name, '' ];
             return r[0].replaceNew(opt.after, opt.after+text, { all: true }) + r[1];
         },
         before: function () {
             assert(_.isString(name));
             assert(_.isString(opt.before));
 
-            r = global.extension(name);
+            r = (opt.skipext)? global.extension(name): [ name, '' ];
             return r[0].replaceNew(opt.before, text+opt.before, { all: true }) + r[1];
         }
     };
