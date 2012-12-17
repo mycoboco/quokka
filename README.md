@@ -68,8 +68,8 @@ example, shows how to rename files' extensions to `.node` using `quokka`:
 
     > exit
 
-where the `>` indicates a `quokka`'s prompt and `#extension` before it does the
-user is editing the `#extension` rule. Typing `help` shows what commands
+where `>` indicates a `quokka`'s prompt and `#extension` before it shows the
+user is editing the `#extension` rule. Typing `help` lists what commands
 `quokka` accepts in general and in a specific rule mode. (In fact, `quokka`
 displays characters in color for readability; see the screenshot above.)
 
@@ -87,7 +87,7 @@ say, a updated one, it is necessary to apply these changes properly.
 
 ###Usage Tips
 
-A few useful tips go here.
+A few useful tips follow below.
 
 1. Sort files in a natural order
 
@@ -96,15 +96,14 @@ A few useful tips go here.
   the option, `quokka` performs lexicographic comparison which puts, say,
   `img10` before `img2` because `1` has a smaller code than `2` has. This looks
   natural to most (if not all) programmers, but ordinary users would like to
-  put `10` after `2` which the `-v` option does.
+  place `10` after `2` which the `-v` option does.
 
 2. Control the sorting order
 
-  `quokka` can accepts file names to rename from the contents of a file
-  given through the `-f` option. For example, you can edit the file obtained
-  from redirection of `ls -t -1` (where `-t` for sorting by modification time
-  and `-1` for displaying only file names) and give it to quokka with the `-f`
-  option.
+  `quokka` can accept file names to rename from an external file given through
+  the `-f` option. For example, you can edit the file obtained from redirection
+  of `ls -t -1` (where `-t` for sorting by modification time and `-1` for
+  displaying only file names) and give it to `quokka` with the `-f` option.
 
 3. One-line multiple-command
 
@@ -113,7 +112,7 @@ A few useful tips go here.
 
         > #extension change to docx done rename
 
-  instead of:
+  instead of these multiple lines:
 
         > #extension
         #extension> change to docx
@@ -123,7 +122,7 @@ A few useful tips go here.
   The thing is that the newline character does not differ from other
   white-spaces in separating commands.
 
-4. Names with spaces
+4. Names with embedded spaces
 
   The earlier versions of `quokka` used quotation for spaces embedded in file
   names. This approach made troubles with `readline`'s auto-completion
@@ -138,17 +137,18 @@ A few useful tips go here.
 
         #strip> strip \\
 
-  makes `quokka` strip off all instances of `\`. In most cases, the smart
+  does `quokka` strip off all instances of `\`. In most cases, the smart
   auto-completion explained below helps you not to forget escaping spaces.
 
 5. Smart auto-completion
 
-  The recent version of `quokka` support the smart auto-completion that is
+  The recent versions of `quokka` support the smart auto-completion that is
   _smart_ in the sense that it is aware of the input context and suggests
-  appropriate words. For example, pressing a tab key after `HDTV` when `quokka`
-  expects arguments for `replace` shows every partial string starting with
-  `HDTV` in file names to rename. This helps you to stop using a mouse to copy
-  and paste characters from your terminal screen.
+  appropriate words. For example, pressing a `tab` key after `HDTV` when
+  `quokka` expects arguments for the `replace` command shows every partial
+  string starting with `HDTV` in file names to rename. This helps you to
+  avoid annoying use of your mouse to copy characters from your terminal
+  screen.
 
 If you have a question or suggestion, do not hesitate to contact me via email
 (woong.jun at gmail.com) or web (http://code.woong.org/).
