@@ -20,8 +20,8 @@ It provides a set of rules:
 - to insert a text into a specified position (`#insert`)
 - to remove a text (`#remove`)
 - to replace a text (`#replace`)
-- to serialize file names (`#serialize`) and
-- to strip a set of characters off (`#strip`)
+- to serialize file names (`#serialize`)
+- to strip a set of characters off (`#strip`) and
 - to import lines of a file for insertion (`#import`)
 
 with options for fine control. You can combine these rules as you want by
@@ -71,11 +71,11 @@ example, shows how to rename files' extensions to `.node` using `quokka`:
 where the `>` indicates a `quokka`'s prompt and `#extension` before it does the
 user is editing the `#extension` rule. Typing `help` shows what commands
 `quokka` accepts in general and in a specific rule mode. (In fact, `quokka`
-displays characters in color for readability; see the screenshot linked above.)
+displays characters in color for readability; see the screenshot above.)
 
-Even if its source code contains some stuff realted to MS Windows, it currently
+Even if its source code contains some stuff related to MS Windows, it currently
 supports and is tested only for UNIX-like environments. For now, nothing is
-guranteed for MS Windows.
+guaranteed for MS Windows.
 
 `INSTALL.md` explains how to build and install the program. For the copyright
 issues, see the accompanying `LICENSE.md` file.
@@ -84,6 +84,71 @@ Among libraries used, `alphanum.js` has been modified to meet `quokka`'s needs;
 it has been modified to behave in a more similar way to `ls -v` and to return
 the sorted array instead of nothing. If you need to replace that module with,
 say, a updated one, it is necessary to apply these changes properly.
+
+###Usage Tips
+
+A few useful tips go here.
+
+1. Sort files in a natural order
+
+  The `-v` option makes `quokka` behave in the same way as `ls -v` when
+  sorting file names; it affects how numbers in file names are handled. Without
+  the option, `quokka` performs lexicographic comparison which puts, say,
+  `img10` before `img2` because `1` has a smaller code than `2` has. This looks
+  natural to most (if not all) programmers, but ordinary users would like to
+  put `10` after `2` which the `-v` option does.
+
+2. Control the sorting order
+
+  `quokka` can accepts file names to rename from the contents of a file
+  given through the `-f` option. For example, you can edit the file obtained
+  from redirection of `ls -t -1` (where `-t` for sorting by modification time
+  and `-1` for displaying only file names) and give it to quokka with the `-f`
+  option.
+
+3. One-line multiple-command
+
+  `quokka` is designed to accept multiple commands in a line. For example, you
+  can change files' extensions to `docx` by this one-line input:
+
+        > #extension change to docx done rename
+
+  instead of:
+
+        > #extension
+        #extension> change to docx
+        #extension> done
+        > rename
+
+  The thing is that the newline character does not differ from other
+  white-spaces in separating commands.
+
+4. Names with spaces
+
+  The earlier versions of `quokka` used quotation for spaces embedded in file
+  names. This approach made troubles with `readline`'s auto-completion
+  supported by `node.js`, and had me choose to escape spaces with a leading
+  backslash. Since the backslash character is now used for escaping spaces, it
+  is necessary to escape backslashes themselves. For example,
+
+        #replace> replace \  .
+
+  makes `quokka` replace a space with a period (_note_ the space after `\`),
+  and
+
+        #strip> strip \\
+
+  makes `quokka` strip off all instances of `\`. In most cases, the smart
+  auto-completion explained below helps you not to forget escaping spaces.
+
+5. Smart auto-completion
+
+  The recent version of `quokka` support the smart auto-completion that is
+  _smart_ in the sense that it is aware of the input context and suggests
+  appropriate words. For example, pressing a tab key after `HDTV` when `quokka`
+  expects arguments for `replace` shows every partial string starting with
+  `HDTV` in file names to rename. This helps you to stop using a mouse to copy
+  and paste characters from your terminal screen.
 
 If you have a question or suggestion, do not hesitate to contact me via email
 (woong.jun at gmail.com) or web (http://code.woong.org/).
