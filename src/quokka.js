@@ -195,20 +195,15 @@ var setGlobal = function (vars) {
             e[name] = {
                 spec: [ name ],
                 func: function () {
-                    if (name === ctx.name())
-                        ERR('you are already in `%r\'\n', names[i].rule);
-                    else if (ctx.isSet())
-                        ERR('you need to cancel the rule being edited first\n');
-                    else {
-                        OK('entering `%r\'\n', name);
-                        prompt = name + '> ';
-                        ctx.set(ch, name);
-                        cset.add({
-                            name: name,
-                            set:  ctx.commandSet()
-                        }).remove('rules');
-                        p.cmdset(cset.get());
-                    }
+                    assert(!ctx.isSet());
+
+                    OK('entering `%r\'\n', name);
+                    prompt = name + '> ';
+                    ctx.set(ch, name);
+                    cset.add({
+                        name: name,
+                        set:  ctx.commandSet()
+                    }).remove('rules');
                 },
                 dryrun: function (lastr) {
                     if (!lastr) {
@@ -726,11 +721,14 @@ var setGlobal = function (vars) {
     p = parser(cset.get());
 
     rl.on('line', function(line) {
-        var t;
+        var cmd, t;
 
         p.start(line);
         while ((t = p.token()).cmd) {
-            cset.cmd(t.cmd).func(t.param);
+            cmd = cset.cmd(t.cmd);
+            cmd.func(t.param);
+            if (_.isFunction(cmd.dryrun))
+                p.cmdset(cset.get());
             if (newset.length > 0)
                 WARN('you need to `%c\' file list and rules after `%c\'\n', 'reset', 'rename');
         }

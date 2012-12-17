@@ -69,6 +69,7 @@ module.exports = function (cset, l) {
 
         assert(_.isObject(cset));
 
+        rule = {};
         cset.foreach(function (name) {
             r = rule;
             c = this[name].spec;
