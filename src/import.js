@@ -192,6 +192,9 @@ module.exports = function () {
                 if (opt.func === 'prefix')
                     WARN('`%c\' is not meaningful with `%c\'', 'skip extension', 'as prefix');
                 OK('text will be appended ' + 'before extensions\n'.val);
+            },
+            chext: function () {
+                COMPLETER.ext(false);
             }
         },
         'include extension': {
@@ -202,6 +205,9 @@ module.exports = function () {
                     WARN('`%c\' is not meaningful with `%c\'', 'including extension',
                          'as prefix');
                 OK('text will be appended ' + 'to extensions\n'.val);
+            },
+            chext: function () {
+                COMPLETER.ext(true);
             }
         },
         'at': {

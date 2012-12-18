@@ -125,7 +125,7 @@ var handleArgv = function () {
         } else {
             argv.f = argv.f || argv.file;
             if (!_.isString(argv.f) || !argv.f) {
-                ERR('file name must be given to `%c\' or `%c\'', '-f', '--file');
+                ERR('file name must be given to `%c\' or `%c\'\n', '-f', '--file');
                 _usage();
             }
             try {
@@ -179,7 +179,8 @@ var setGlobal = function (vars) {
             memo.push({
                 name:        '#' + r[idx].id,
                 desc:        r[idx].desc,
-                constructor: r[idx]
+                constructor: r[idx],
+                init:        r[idx].init
             });
             return memo;
         }, []);
@@ -195,6 +196,8 @@ var setGlobal = function (vars) {
             e[name] = {
                 spec: [ name ],
                 func: function () {
+                    var init;
+
                     assert(!ctx.isSet());
 
                     OK('entering `%r\'\n', name);
@@ -204,16 +207,23 @@ var setGlobal = function (vars) {
                         name: name,
                         set:  ctx.commandSet()
                     }).remove('rules');
+                    init = ch.rule(name).init;
+                    if (_.isFunction(init))
+                        init();
                 },
-                dryrun: function (lastr) {
-                    if (!lastr) {
+                chcset: function (info) {    // for dry run
+                    var r;
+
+                    if (!info.lastr) {
+                        r = ch.rule(name);
                         cset.add({
                             name: name,
-                            set:  ch.rule(name)().commandSet()
+                            set:  r().commandSet()
                         }).remove('rules');
-                        return name;
+                        if (_.isFunction(r.init))
+                            r.init();
+                        info.lastr = name;
                     }
-                    return lastr;
                 }
             };
 
@@ -458,11 +468,15 @@ var setGlobal = function (vars) {
                     }
                     prompt = defPrompt;
                 },
-                dryrun: function (lastr) {
-                    if (lastr)
-                        cset.remove(lastr).add(rules);
-                    return null;
-                }
+                chcset: function (info) {    // for dry run
+                    if (info.lastr) {
+                        cset.remove(info.lastr).add(rules);
+                        info.lastr= null;
+                    }
+                },
+                chext: function () {
+                    COMPLETER.ext(false);
+                },
             },
             'done': {
                 spec: [ 'done' ],
@@ -481,10 +495,14 @@ var setGlobal = function (vars) {
                     fromTo(ch.initial(), ch.final());
                     prompt = defPrompt;
                 },
-                dryrun: function (lastr) {
-                    if (lastr)
-                        cset.remove(lastr).add(rules);
-                    return null;
+                chcset: function (info) {    // for dry run
+                    if (info.lastr) {
+                        cset.remove(info.lastr).add(rules);
+                        info.lastr = null;
+                    }
+                },
+                chext: function () {
+                    COMPLETER.ext(false);
                 }
             },
             'describe': {
@@ -615,17 +633,18 @@ var setGlobal = function (vars) {
 
     // mamages readline completer
     var completer = function () {
+        var drinfo = {};
+
         // completer function for readline
         // line = 'user input'
-        return function (line) {
+        var run = function (line) {
             var hit = [], comp;
             var p = parser(cset.get(), line);
-            var last = {
+            var t, last = {
                 last: '',
                 expect: 'cmd'
             };
-            var lastr = (ctx.isSet())? ctx.name(): null;
-            var t;
+            var incext;
 
             var esc = function (s) {
                 assert(_.isString(s));
@@ -634,14 +653,21 @@ var setGlobal = function (vars) {
                 return s;
             };
 
+            drinfo.lastr = (ctx.isSet())? ctx.name(): null;
+
             cset.push();
+            incext = drinfo.incext;
             while ((t = p.token(true)).last !== null) {
                 last = t;
                 if (t.cmd) {
                     t = cset.cmd(t.cmd);
-                    if (t && _.isFunction(t.dryrun)) {
-                        lastr = t.dryrun(lastr);
-                        p.cmdset(cset.get());
+                    if (t) {
+                        if (_.isFunction(t.chcset)) {
+                            t.chcset(drinfo);
+                            p.cmdset(cset.get());
+                        }
+                        if (_.isFunction(t.chext))
+                            t.chext();
                     }
                 }
             }
@@ -649,7 +675,7 @@ var setGlobal = function (vars) {
                 switch (last.expect) {
                     case 'param':
                         comp = ch.peek(ctx.current()).collect('file').process(function (f) {
-                            return esc(f);
+                            return esc((drinfo.incext)? f: global.extension(f)[0]);
                         });
                         (function () {
                             var n, s, h = {};
@@ -708,13 +734,34 @@ var setGlobal = function (vars) {
                             last.last = '';
                         break;
                 }
+            drinfo.incext = incext;
             cset.pop();
 
             return [((hit.length > 0)? hit: comp), last.last];
         };
+
+        // gets or sets extension-inclusion flag for auto-completion
+        // optional incext = true/false
+        var ext = function (incext) {
+            if (_.isUndefined(incext))
+                return !!drinfo.incext;
+            else
+                drinfo.incext = !!incext;
+
+            return this;
+        };
+
+        return {
+            run: run,
+            ext: ext
+        };
     };
 
-    rl = readline.createInterface(process.stdin, process.stdout, completer());
+    setGlobal({
+        COMPLETER: completer(),
+    });
+
+    rl = readline.createInterface(process.stdin, process.stdout, COMPLETER.run);
     rl.setPrompt(prompt);
     rl.prompt();
 
@@ -727,8 +774,10 @@ var setGlobal = function (vars) {
         while ((t = p.token()).cmd) {
             cmd = cset.cmd(t.cmd);
             cmd.func(t.param);
-            if (_.isFunction(cmd.dryrun))
+            if (_.isFunction(cmd.chcset))
                 p.cmdset(cset.get());
+            if (_.isFunction(cmd.chext))
+                cmd.chext();
             if (newset.length > 0)
                 WARN('you need to `%c\' file list and rules after `%c\'\n', 'reset', 'rename');
         }

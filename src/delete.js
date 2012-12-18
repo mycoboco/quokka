@@ -190,6 +190,9 @@ module.exports = function () {
             func: function () {
                 opt.skipext = true;
                 OK('extensions will be %v while deleting\n', 'ignored');
+            },
+            chext: function () {
+                COMPLETER.ext(false);
             }
         },
         'include extension': {
@@ -197,6 +200,9 @@ module.exports = function () {
             func: function () {
                 opt.skipext = false;
                 OK('extensions will be %v while deleting\n', 'included');
+            },
+            chext: function () {
+                COMPLETER.ext(true);
             }
         },
         'right to left': {

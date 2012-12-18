@@ -115,5 +115,8 @@ module.exports = function () {
 // name and description for rule
 module.exports.id = 'extension';
 module.exports.desc = 'change file extensions';
+module.exports.init = function () {
+    COMPLETER.ext(true);    // default: including extensions
+};
 
 // end of extension.js
