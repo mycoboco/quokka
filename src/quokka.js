@@ -103,7 +103,6 @@ var handleArgv = function () {
     var _usage = function () {
         //   12345678911234567892123456789312345678941234567895123456789612345678971234567898
         OUT(
-            '\n' +
             'Usage: ' + 'quokka'.prog + ' [OPTION...] [FILE]...\n' +
             'Rename FILEs in an interactive manner.\n\n' +
             'Mandatory arguments to long options are mandatory for short options too.\n' +
@@ -114,13 +113,13 @@ var handleArgv = function () {
             '-v',
             '-n');
         OUT('For bug reporting instructions, please see:\n'.etc +
-            '<http://code.woong.org/quokka>.\n'.etc);
+            '<http://code.woong.org/quokka>.'.etc);
         exit();
     };
 
     if (argv.f || argv.file) {
         if (argv.f && argv.file) {
-            ERR('only one of `%c\' or `%c\' must be given', '-f', '--file');
+            ERR('only one of `%c\' or `%c\' must be given\n', '-f', '--file');
             _usage();
         } else {
             argv.f = argv.f || argv.file;
@@ -131,7 +130,7 @@ var handleArgv = function () {
             try {
                 buf = fs.readFileSync(argv.f);
             } catch(e) {
-                ERR('%s', e.message);
+                ERR('%s\n', e.message);
                 _usage();
             };
             argv._ = split(buf.toString());
@@ -145,6 +144,8 @@ var handleArgv = function () {
                 argv._.sort();
         }
         argv._ = nameList(argv._);
+        if (argv._.length === 0)
+            OUT('');
     }
 
     if (argv._.length === 0)
