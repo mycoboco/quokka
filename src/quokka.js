@@ -137,11 +137,13 @@ var handleArgv = function () {
             argv._ = split(buf.toString());
         }
     }
-    if (argv._) {
-        if (argv.v)
-            argv._.alphanumSort();
-        else if (!argv.n)
-            argv._.sort();
+    if (argv._.length > 0) {
+        if (!argv.n) {    // -n overrides -v
+            if (argv.v)
+                argv._.alphanumSort();
+            else
+                argv._.sort();
+        }
         argv._ = nameList(argv._);
     }
 
