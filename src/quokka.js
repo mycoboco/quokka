@@ -132,7 +132,7 @@ var handleArgv = function () {
             } catch(e) {
                 ERR('%s\n', e.message);
                 _usage();
-            };
+            }
             argv._ = split(buf.toString());
         }
     }

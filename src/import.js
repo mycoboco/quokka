@@ -69,7 +69,7 @@ module.exports = function () {
         try {
             line  = fs.readFileSync(file, 'utf-8');
         } catch(e) {
-            ERR('error occurred while reading import file\n');
+            ERR('%s\n', e.message);
             return null;
         }
 
