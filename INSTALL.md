@@ -22,7 +22,7 @@ directory like `/usr/bin` or `/usr/local/bin` a shell script that runs
 
     #!/bin/sh
 
-    node /path/to/quokka/quokka.js -v "%@"
+    node /path/to/quokka/quokka.js -v "$@"
 
 or to set an alias for `node.js` running `quokka`:
 
