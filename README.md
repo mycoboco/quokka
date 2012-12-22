@@ -96,7 +96,7 @@ A few useful tips follow below.
   the option, `quokka` performs lexicographic comparison which puts, say,
   `img10` before `img2` because `1` has a smaller code than `2` has. This looks
   natural to most (if not all) programmers, but ordinary users would like to
-  place `10` after `2` which the `-v` option does.
+  place `10` after `2`, which the `-v` option does.
 
 2. Control the sorting order
 
