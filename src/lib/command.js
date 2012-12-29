@@ -56,8 +56,8 @@ module.exports = function (init) {
             return flatten;
 
         if (stack[idx])
-            flatten = stack[idx].foreach(function (name, memo) {
-                return memo.merge(this[name]);
+            flatten = global.foreach(stack[idx], function (name, memo) {
+                return global.merge(memo, this[name]);
             }, {});
 
         return flatten;
@@ -74,7 +74,7 @@ module.exports = function (init) {
     // init = [ { rule entry }, ... ]
     var push = function (init) {
         if (stack[idx]) {
-            stack[idx+1] = stack[idx].clone();
+            stack[idx+1] = global.clone(stack[idx]);
             idx++;
             flatten = null;
         }

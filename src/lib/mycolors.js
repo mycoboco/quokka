@@ -7,7 +7,7 @@ var assert = require('assert');
 var _ = require('../../node_modules/underscore');
 var colors = require('../../node_modules/colors');
 
-var common = require('./global');
+var global = require('./global');
 
 
 // wrapper for colored messages
@@ -86,7 +86,7 @@ var mycolors = module.exports = function (theme) {
             return this;
         });
 
-        theme.foreach(function (i) {
+        global.foreach(theme, function (i) {
             assert(theme[i].color);
             assert(theme[i].abbr);
             assert(theme[i].abbr !== 's');

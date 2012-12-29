@@ -16,38 +16,37 @@ Function.prototype.method = function (name, func) {
 
 
 // runs closure for each property
-Object.method('foreach', function (closure, init) {
+global.foreach = function (obj, closure, init) {
     var i,
         memo = init,
-        keys = Object.keys(this);
+        keys = Object.keys(obj);
 
     for (i = 0; i < keys.length; i++)
-        if (keys[i] !== 'foreach')
-        memo = closure.call(this, keys[i], memo);
+        memo = closure.call(obj, keys[i], memo);
 
     return memo;
-});
+};
 
 
 // clone from underscore.js copies properties from prototype link
-Object.method('clone', function () {
-    return this.foreach(function (key, memo) {
+global.clone = function (obj) {
+    return global.foreach(obj, function (key, memo) {
         memo[key] = this[key];
         return memo;
     }, {});
-});
+};
 
 
 // extend from underscore.js merges properties from prototype link
-Object.method('merge', function (obj) {
-    var that = this;
+global.merge = function (obj1, obj2) {
+    var that = obj1;
 
-    obj.foreach(function (key) {
+    global.foreach(obj2, function (key) {
         that[key] = this[key];
     });
 
     return that;
-});
+};
 
 
 // processes an array
