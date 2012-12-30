@@ -160,7 +160,7 @@ var handleArgv = function () {
 var setGlobal = function (vars) {
     assert(_.isObject(vars));
 
-    global.foreach(vars, function (v) {
+    vars.foreach(function (v) {
         GLOBAL[v] = this[v];
     });
 };
@@ -178,7 +178,7 @@ var setGlobal = function (vars) {
     var prepRuleForChain = function (r) {
         assert(_.isArray(r));
 
-        return global.foreach(r, function (idx, memo) {
+        return r.foreach(function (idx, memo) {
             memo.push({
                 name:        '#' + r[idx].id,
                 desc:        r[idx].desc,
@@ -194,7 +194,7 @@ var setGlobal = function (vars) {
 
         assert(_.isArray(r));
 
-        return global.foreach(r, function (idx) {
+        return r.foreach(function (idx) {
             var name = '#' + r[idx].id;
             e[name] = {
                 spec: [ name ],

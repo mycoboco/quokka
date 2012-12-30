@@ -86,7 +86,7 @@ var mycolors = module.exports = function (theme) {
             return this;
         });
 
-        global.foreach(theme, function (i) {
+        theme.foreach(function (i) {
             assert(theme[i].color);
             assert(theme[i].abbr);
             assert(theme[i].abbr !== 's');

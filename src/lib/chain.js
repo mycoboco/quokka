@@ -86,7 +86,7 @@ module.exports = function (init) {
         if (cache)
             return cache;
 
-        cache = global.foreach(rules, function (name, memo) {
+        cache = rules.foreach(function (name, memo) {
             memo.push({
                 name: name,
                 desc: rules[name].desc

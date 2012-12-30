@@ -70,7 +70,7 @@ module.exports = function (cset, l) {
         assert(_.isObject(cset));
 
         rule = {};
-        global.foreach(cset, function (name) {
+        cset.foreach(function (name) {
             r = rule;
             c = this[name].spec;
             for (var j = 0; j < c.length; j++) {
@@ -123,7 +123,7 @@ module.exports = function (cset, l) {
                     ret.last = '';
             }
             if (_.isString(r)) {
-                return global.merge(ret, {
+                return ret.merge({
                     cmd:   r,
                     param: param
                 });

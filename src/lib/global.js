@@ -3,6 +3,7 @@
  */
 
 var assert = require('assert');
+
 var _ = require('../../node_modules/underscore');
 
 var global = exports;
@@ -11,42 +12,47 @@ var global = exports;
 // adds method to constructor
 Function.prototype.method = function (name, func) {
     this.prototype[name] = func;
+    Object.defineProperty(this.prototype, name, { enumerable: false });
     return this;
 };
 
 
+// makes the method property unenumerable
+Object.defineProperty(Function.prototype, 'method', { enumerable: false });
+
+
 // runs closure for each property
-global.foreach = function (obj, closure, init) {
+Object.method('foreach', function (closure, init) {
     var i,
         memo = init,
-        keys = Object.keys(obj);
+        keys = Object.keys(this);
 
     for (i = 0; i < keys.length; i++)
-        memo = closure.call(obj, keys[i], memo);
+        memo = closure.call(this, keys[i], memo);
 
     return memo;
-};
+});
 
 
 // clone from underscore.js copies properties from prototype link
-global.clone = function (obj) {
-    return global.foreach(obj, function (key, memo) {
+Object.method('clone', function () {
+    return this.foreach(function (key, memo) {
         memo[key] = this[key];
         return memo;
     }, {});
-};
+});
 
 
 // extend from underscore.js merges properties from prototype link
-global.merge = function (obj1, obj2) {
-    var that = obj1;
+Object.method('merge', function (obj) {
+    var that = this;
 
-    global.foreach(obj2, function (key) {
+    obj.foreach(function (key) {
         that[key] = this[key];
     });
 
     return that;
-};
+});
 
 
 // processes an array
