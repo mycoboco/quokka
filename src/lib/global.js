@@ -22,9 +22,8 @@ Object.defineProperty(Function.prototype, 'method', { enumerable: false });
 
 
 // runs closure for each property
-Object.method('foreach', function (closure, init) {
+Object.method('foreach', function (closure, memo) {
     var i,
-        memo = init,
         keys = Object.keys(this);
 
     for (i = 0; i < keys.length; i++)
