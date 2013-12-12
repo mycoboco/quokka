@@ -34,7 +34,7 @@ var strip = require('./strip');
 var letterCase = require('./case');
 var im = require('./import');
 
-var VERSION = '0.0.6';
+var VERSION = '0.0.7';
 
 
 // terminates program
