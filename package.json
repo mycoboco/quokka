@@ -11,11 +11,11 @@
   ],
   "homepage": "http://code.woong.org/quokka",
   "repository": {
-    "type": "hg",
-    "url": "http://code.woong.org/hg/quokka"
+    "type": "git",
+    "url": "https://github.com/mycoboco/quokka.git"
   },
   "bugs": {
-    "url": "http://code.woong.org/quokka/trac",
+    "url": "https://github.com/mycoboco/quokka/issues",
     "email": "woong.jun@gmail.com"
   },
   "main": "src/quokka.js",
