@@ -98,12 +98,9 @@ var nameList = function (list) {
 var handleArgv = function () {
     var buf;
 
-    assert(argv);
-
     var _usage = function () {
         //   12345678911234567892123456789312345678941234567895123456789612345678971234567898
-        OUT(
-            'Usage: ' + 'quokka'.prog + ' [OPTION...] [FILE]...\n' +
+        OUT('Usage: ' + 'quokka'.prog + ' [OPTION...] [FILE]...\n' +
             'Rename FILEs in an interactive manner.\n\n' +
             'Mandatory arguments to long options are mandatory for short options too.\n' +
             '  %c, %c=TEXT      names given in TEXT file used instead of FILE\n' +
@@ -116,6 +113,8 @@ var handleArgv = function () {
             '<http://code.woong.org/quokka>.'.etc);
         exit();
     };
+
+    assert(argv);
 
     if (argv.f || argv.file) {
         if (argv.f && argv.file) {
