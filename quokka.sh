@@ -1,5 +1,7 @@
-#!/bin/bash
+#!/bin/sh
 
-node src/quokka.js -v "$@"
+NODE="node"
+
+${NODE} src/quokka.js -v "$@"
 
 # end of quokka.sh
