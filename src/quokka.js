@@ -7,12 +7,12 @@ var readline = require('readline');
 var path = require('path');
 var fs = require('fs');
 
-var _ = require('../node_modules/underscore');
-var argv = require('../node_modules/optimist')
+var _ = require('underscore');
+var argv = require('optimist')
                .boolean('v')
                .boolean('n')
                .argv;
-var string = require('../node_modules/string');
+var string = require('string');
 
 var alphanum = require('./lib/alphanum.js');
 var global = require('./lib/global');

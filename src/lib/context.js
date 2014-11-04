@@ -4,7 +4,7 @@
 
 var assert = require('assert');
 
-var _ = require('../../node_modules/underscore');
+var _ = require('underscore');
 
 
 // manages context

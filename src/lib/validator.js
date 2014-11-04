@@ -5,7 +5,7 @@
 var assert = require('assert');
 var path = require('path');
 
-var _ = require('../../node_modules/underscore');
+var _ = require('underscore');
 
 // validates file names
 // kind = 'system name'

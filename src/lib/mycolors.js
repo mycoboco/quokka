@@ -4,8 +4,8 @@
 
 var assert = require('assert');
 
-var _ = require('../../node_modules/underscore');
-var colors = require('../../node_modules/colors');
+var _ = require('underscore');
+var colors = require('colors');
 
 var global = require('./global');
 

@@ -5,7 +5,7 @@
 var assert = require('assert');
 var path = require('path');
 
-var _ = require('../../node_modules/underscore');
+var _ = require('underscore');
 
 var global = require('./global');
 var wcwidth = require('../../node_modules/wcwidth.js')();

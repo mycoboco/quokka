@@ -5,7 +5,7 @@
 var assert = require('assert');
 var fs = require('fs');
 
-var _ = require('../node_modules/underscore');
+var _ = require('underscore');
 
 var global = require('./lib/global');
 
