@@ -1,10 +1,9 @@
-How To Build and Install quokka
+How to build and install quokka
 ===============================
 
 This package does not provide an automated way to build or install the program
 except using [`npm`](http://npmjs.org/package/quokka) because `quokka` runs on
-top of [`node.js`](http://nodejs.org) that is a javascript interpreter. If you
-have `node.js` on your system,
+top of [`node.js`](http://nodejs.org). If you have `node.js` on your system,
 
     npm install quokka
 

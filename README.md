@@ -1,4 +1,4 @@
-quokka: An Interactive File Renamer
+quokka: an interactive file renamer
 ===================================
 
 `quokka` is an interactive file renamer, which helps to rename multiple files
@@ -25,7 +25,7 @@ It provides a set of rules:
 - to import lines of a file for insertion (`#import`)
 
 with options for fine control. You can combine these rules as you want by
-adding them into the rule chain. Editing each rule and the rule chain is
+adding them into the _rule chain_. Editing each rule and the rule chain is
 performed interactively as you do in a shell prompt. The following, for
 example, shows how to rename files' extensions to `.node` using `quokka`:
 
@@ -71,11 +71,12 @@ example, shows how to rename files' extensions to `.node` using `quokka`:
 where `>` indicates a `quokka`'s prompt and `#extension` before it shows the
 user is editing the `#extension` rule. Typing `help` lists what commands
 `quokka` accepts in general and in a specific rule mode. (In fact, `quokka`
-displays characters in color for readability; see the screenshot above.)
+displays characters in color for better readability.)
 
 Even if its source code contains some stuff related to MS Windows, it currently
-supports and is tested only for UNIX-like environments. For now, nothing is
-guaranteed for MS Windows.
+supports and is tested only for
+[Unix-like](http://en.wikipedia.org/wiki/Unix-like) environments. For now,
+nothing is guaranteed for MS Windows.
 
 `INSTALL.md` explains how to build and install the program. For the copyright
 issues, see the accompanying `LICENSE.md` file.
@@ -110,14 +111,14 @@ A few useful tips follow below.
   `quokka` is designed to accept multiple commands in a line. For example, you
   can change files' extensions to `docx` by this one-line input:
 
-        > #extension change to docx done rename
+       > #extension change to docx done rename
 
   instead of these multiple lines:
 
-        > #extension
-        #extension> change to docx
-        #extension> done
-        > rename
+       > #extension
+       #extension> change to docx
+       #extension> done
+       > rename
 
   The thing is that the newline character does not differ from other
   white-spaces in separating commands.
@@ -130,12 +131,12 @@ A few useful tips follow below.
   backslash. Since the backslash character is now used for escaping spaces, it
   is necessary to escape backslashes themselves. For example,
 
-        #replace> replace \  .
+       #replace> replace \  .
 
   makes `quokka` replace a space with a period (_note_ the space after `\`),
   and
 
-        #strip> strip \\
+       #strip> strip \\
 
   does `quokka` strip off all instances of `\`. In most cases, the smart
   auto-completion explained below helps you not to forget escaping spaces.
