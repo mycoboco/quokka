@@ -20,10 +20,10 @@
   },
   "main": "src/quokka.js",
   "dependencies": {
-    "colors": "^0.6.0-1",
-    "optimist": "^0.3.4",
-    "string": "^1.1.0",
-    "underscore": "^1.3.3",
+    "colors": "^1.1.2",
+    "optimist": "^0.6.1",
+    "string": "^3.3.1",
+    "underscore": "^1.8.3",
     "wcwidth.js": "^0.0.1"
   },
   "devDependencies": {
