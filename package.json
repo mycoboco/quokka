@@ -32,7 +32,6 @@
   "engines": {
     "node": ">=0.8.0"
   },
-  "licenses": "MIT",
   "keywords": [
     "rename",
     "file rename",
