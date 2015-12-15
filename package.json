@@ -18,6 +18,7 @@
     "url": "https://github.com/mycoboco/quokka/issues",
     "email": "woong.jun@gmail.com"
   },
+  "license": "MIT",
   "main": "src/quokka.js",
   "dependencies": {
     "colors": "^1.1.2",
