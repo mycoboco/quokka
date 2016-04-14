@@ -7,8 +7,7 @@
     "email": "woong.jun@gmail.com",
     "url": "http://code.woong.org/"
   },
-  "contributors": [
-  ],
+  "contributors": [],
   "homepage": "http://code.woong.org/quokka",
   "repository": {
     "type": "git",
@@ -29,14 +28,9 @@
   },
   "devDependencies": {
   },
-  "engines": {
-    "node": ">=0.8.0"
-  },
+  "engines": { "node": ">=0.12.6" },
   "keywords": [
-    "rename",
-    "file rename",
-    "batch renamer",
-    "interactive renamer",
+    "rename", "file rename", "batch renamer", "interactive renamer",
     "terminal"
   ]
 }
