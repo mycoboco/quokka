@@ -26,8 +26,7 @@
     "underscore": "^1.8.3",
     "wcwidth.js": "^0.0.1"
   },
-  "devDependencies": {
-  },
+  "devDependencies": {},
   "engines": { "node": ">=0.12.6" },
   "keywords": [
     "rename", "file rename", "batch renamer", "interactive renamer",
