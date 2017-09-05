@@ -10,8 +10,8 @@ top of [`node.js`](http://nodejs.org). If you have `node.js` on your system,
 brings and installs `quokka` with its all depending packages.
 
 _The `--legacy-bundling` option is necessary when using `npm3` because, without
-it, dependent modules are installed at the same nesting level as `quokka` into
-`node_modules`._
+it, dependent modules will be installed at the same nesting level as `quokka`
+into `node_modules`._
 
 The simplest way to use `quokka` is just to run it using `node.js` as follows:
 
