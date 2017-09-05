@@ -5,9 +5,13 @@ This package does not provide an automated way to build or install the program
 except using [`npm`](http://npmjs.org/package/quokka) because `quokka` runs on
 top of [`node.js`](http://nodejs.org). If you have `node.js` on your system,
 
-    npm install quokka
+    npm install --legacy-bundling quokka
 
 brings and installs `quokka` with its all depending packages.
+
+_The `--legacy-bundling` option is necessary when using `npm3` because, without
+it, dependent modules are installed at the same nesting level as `quokka` into
+`node_modules`._
 
 The simplest way to use `quokka` is just to run it using `node.js` as follows:
 
