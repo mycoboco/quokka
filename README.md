@@ -86,7 +86,7 @@ it has been modified to behave in a more similar way to `ls -v` and to return
 the sorted array instead of nothing. If you need to replace that module with,
 say, a updated one, it is necessary to apply these changes properly.
 
-###Usage Tips
+### Usage Tips
 
 A few useful tips follow below.
 
