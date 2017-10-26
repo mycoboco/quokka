@@ -29,44 +29,7 @@ adding them into the _rule chain_. Editing each rule and the rule chain is
 performed interactively as you do in a shell prompt. The following, for
 example, shows how to rename files' extensions to `.node` using `quokka`:
 
-    > #extension
-    entering '#extension'
-
-    #extension> change to node
-    file extensions will change to 'node'
-
-    #extension> preview
-    current rule being edited
-    -------------------------
-    change extensions to 'node' not using limit
-
-    files will be renamed as follows when you type 'done' and 'rename'
-    ------------------------------------------------------------------
-    ./alphanum.js  | ./alphanum.node
-    ./global.js    | ./global.node
-    ./mycolors.js  | ./mycolors.node
-    ./validator.js | ./validator.node
-
-    #extension> done
-    files will be renamed as follows when you type 'rename'
-    -------------------------------------------------------
-    ./alphanum.js  | ./alphanum.node
-    ./global.js    | ./global.node
-    ./mycolors.js  | ./mycolors.node
-    ./validator.js | ./validator.node
-
-    > rename
-    files are being renamed
-    -----------------------
-    ./alphanum.js  | ./alphanum.node  [ok]
-    ./global.js    | ./global.node    [ok]
-    ./mycolors.js  | ./mycolors.node  [ok]
-    ./validator.js | ./validator.node [ok]
-
-    4 files successfully renamed
-    you need to 'reset' file list and rules after 'rename'
-
-    > exit
+![running quokka](http://code.woong.org/common/files/quokka-run.png)
 
 where `>` indicates a `quokka`'s prompt and `#extension` before it shows the
 user is editing the `#extension` rule. Typing `help` lists what commands
