@@ -306,7 +306,7 @@ var setGlobal = function (vars) {
         OUT('quokka'.prog + ': an interactive file renamer ' + VERSION + '\n%x',
             'This is free software; see the LICENSE file for more information. There is NO\n' +
             'warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n' +
-            'Written by Jun Woong\n');
+            'Written by Woong Jun\n');
     };
 
     var pad = function (s, n) {
