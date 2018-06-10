@@ -9,9 +9,9 @@ small changes to `alphanum.js`, which the accompanying `README.md` file
 elaborates on. The following license does _not_ apply to those modules.
 
 
-Copyright (C) 2012-2014 by Jun Woong.
+Copyright (C) 2012-2014 by Woong Jun.
 
-This package is an interactive file renamer implementation by Jun Woong.
+This package is an interactive file renamer implementation by Woong Jun.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
