@@ -27,9 +27,14 @@
     "wcwidth.js": "^0.0.1"
   },
   "devDependencies": {},
-  "engines": { "node": ">=0.12.6" },
+  "engines": {
+    "node": ">=6.4.0"
+  },
   "keywords": [
-    "rename", "file rename", "batch renamer", "interactive renamer",
+    "rename",
+    "file rename",
+    "batch renamer",
+    "interactive renamer",
     "terminal"
   ]
 }
