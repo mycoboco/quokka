@@ -31,10 +31,7 @@
     "node": ">=6.4.0"
   },
   "keywords": [
-    "rename",
-    "file rename",
-    "batch renamer",
-    "interactive renamer",
+    "rename", "file rename", "batch renamer", "interactive renamer",
     "terminal"
   ]
 }
