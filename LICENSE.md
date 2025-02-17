@@ -4,7 +4,7 @@ quokka: an interactive file renamer
 For your convenience, the package for `quokka` contains non-npm modules it
 depends on to run, and their licenses are specified in their installation
 directories. For example, `alphanum.js` says in its heading comment that it is
-licensed under the [LGPL](http://www.gnu.org/copyleft/lesser.html); there are
+licensed under the [LGPL](https://www.gnu.org/copyleft/lesser.html); there are
 small changes to `alphanum.js`, which the accompanying `README.md` file
 elaborates on. The following license does _not_ apply to those modules.
 

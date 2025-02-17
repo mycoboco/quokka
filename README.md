@@ -5,8 +5,8 @@ quokka: an interactive file renamer
 in a systematic manner.
 
   <div class="center">
-    <a href="http://code.woong.org/img/quokka-sc.png">
-      <img src="http://code.woong.org/img/quokka-sc.png"
+    <a href="https://code.woong.org/img/quokka-sc.png">
+      <img src="https://code.woong.org/img/quokka-sc.png"
         alt="quokka's screenshot"
         style="display:block; margin-left:auto; margin-right:auto" />
     </a>
@@ -29,7 +29,7 @@ adding them into the _rule chain_. Editing each rule and the rule chain is
 performed interactively as you do in a shell prompt. The following, for
 example, shows how to rename files' extensions to `.node` using `quokka`:
 
-![running quokka](http://code.woong.org/common/files/quokka-run.png)
+![running quokka](https://code.woong.org/common/files/quokka-run.png)
 
 where `>` indicates a `quokka`'s prompt and `#extension` before it shows the
 user is editing the `#extension` rule. Typing `help` lists what commands
@@ -38,7 +38,7 @@ displays characters in color for better readability.)
 
 Even if its source code contains some stuff related to MS Windows, it currently
 supports and is tested only for
-[Unix-like](http://en.wikipedia.org/wiki/Unix-like) environments. For now,
+[Unix-like](https://en.wikipedia.org/wiki/Unix-like) environments. For now,
 nothing is guaranteed for MS Windows.
 
 `INSTALL.md` explains how to build and install the program. For the copyright
@@ -115,4 +115,4 @@ A few useful tips follow below.
   screen.
 
 If you have a question or suggestion, do not hesitate to contact me via email
-(woong.jun at gmail.com) or web (http://code.woong.org/).
+(woong.jun at gmail.com) or web (https://code.woong.org/).

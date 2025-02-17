@@ -110,7 +110,7 @@ var handleArgv = function () {
             '-v',
             '-n');
         OUT('For bug reporting instructions, please see:\n'.etc +
-            '<http://code.woong.org/quokka>.'.etc);
+            '<https://code.woong.org/quokka>.'.etc);
         exit();
     };
 
